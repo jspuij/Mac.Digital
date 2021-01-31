@@ -19,7 +19,6 @@ namespace Mac.Digital
                     services.AddBlazorHybrid();
 
                     // Register app-specific services
-                    services.AddSingleton<CounterState>();
                 })
                 .UseWebRoot("wwwroot");
 
