@@ -34,6 +34,7 @@ namespace Mac.Digital
             var host = hostBuilder.Build();
 
             MainPage = new ContentPage { Title = "My Application" };
+            NavigationPage.SetHasNavigationBar(MainPage, false);
             host.AddComponent<Main>(parent: MainPage);
         }
 
