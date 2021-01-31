@@ -2,15 +2,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.0.0
 MinimumVisualStudioVersion = 16.0.0.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mac.Digital", "Mac.Digital\Mac.Digital.csproj", "{9D194961-B528-48ED-8417-FDCEE23858A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mac.Digital", "src\Mac.Digital\Mac.Digital.csproj", "{9D194961-B528-48ED-8417-FDCEE23858A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.Android", "Mac.Digital.Android\Mac.Digital.Android.csproj", "{BAEDE23F-E49E-4792-9D99-DCB79EAA60B4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.Android", src\\Mac.Digital.Android.csproj", "{BAEDE23F-E49E-4792-9D99-DCB79EAA60B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.iOS", "Mac.Digital.iOS\Mac.Digital.iOS.csproj", "{AF7683F0-168B-418D-BA19-9599B0D79283}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.iOS", "src\Mac.Digital.iOS\Mac.Digital.iOS.csproj", "{AF7683F0-168B-418D-BA19-9599B0D79283}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mac.Digital.Windows", "Mac.Digital.Windows\Mac.Digital.Windows.csproj", "{ED502F4F-5B5F-48B8-8764-69BB79769108}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mac.Digital.Windows", "src\Mac.Digital.Windows\Mac.Digital.Windows.csproj", "{ED502F4F-5B5F-48B8-8764-69BB79769108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.macOS", "Mac.Digital.macOS\Mac.Digital.macOS.csproj", "{9EA8E173-6EF7-4652-9053-ED0358CD61CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mac.Digital.macOS", "src\Mac.Digital.macOS\Mac.Digital.macOS.csproj", "{9EA8E173-6EF7-4652-9053-ED0358CD61CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
