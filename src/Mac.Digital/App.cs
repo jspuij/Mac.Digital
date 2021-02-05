@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.MobileBlazorBindings;
@@ -19,6 +22,13 @@ namespace Mac.Digital
                     services.AddBlazorHybrid();
 
                     // Register app-specific services
+                    services.AddBlazorise(options =>
+                    {
+                        options.ChangeTextOnKeyPress = true;
+                    })
+                    .AddBootstrapProviders()
+                    .AddFontAwesomeIcons();
+
                 })
                 .UseWebRoot("wwwroot");
 
@@ -31,6 +41,10 @@ namespace Mac.Digital
                 hostBuilder.UseStaticFiles();
             }
             var host = hostBuilder.Build();
+
+            host.Services
+              .UseBootstrapProviders()
+              .UseFontAwesomeIcons();
 
             MainPage = new ContentPage { Title = "My Application" };
             NavigationPage.SetHasNavigationBar(MainPage, false);
