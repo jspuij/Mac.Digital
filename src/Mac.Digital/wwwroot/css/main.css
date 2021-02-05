@@ -9733,3 +9733,8 @@ h3 {
   right: 0.75rem;
   top: 0.5rem;
 }
+
+#logo {
+  width: 200px;
+  height: 68px;
+}
