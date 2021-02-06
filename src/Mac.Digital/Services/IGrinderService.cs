@@ -22,7 +22,7 @@ namespace Mac.Digital.Services
         /// <summary>
         /// Gets an observable value indicating the power usage in Watts.
         /// </summary>
-        IObservable<double> PowerInWatts { get; }
+        IObservable<decimal> PowerInWatts { get; }
 
         /// <summary>
         /// Gets an observable value indicating the grind time as received from the arduino.
