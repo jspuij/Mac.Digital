@@ -58,9 +58,9 @@ namespace Mac.Digital.Services
         /// </summary>
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        /// <exception cref="GrindException">Thrown when the machine cannot be turned off.</exception>
+        /// <exception cref="GrindException">Thrown when the grinder cannot be turned off.</exception>
         /// <exception cref="TaskCanceledException">Thrown when the grinder does not respond in time.</exception>
-        Task PowerOff(CancellationToken cancellationToken);
+        Task TurnOff(CancellationToken cancellationToken);
 
         /// <summary>
         /// Turns the grinder on to grind automatically and off at the right time.
