@@ -9,7 +9,10 @@ namespace Mac.Digital
     using System.Collections.Generic;
     using System.Text;
 
-    class ScaleException
+    /// <summary>
+    /// An exception that might occur during a scale operation.
+    /// </summary>
+    public class ScaleException : Exception
     {
     }
 }
