@@ -1,26 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xamarin.Forms;
-
-using Foundation;
-using UIKit;
+﻿// <copyright file="AppDelegate.cs" company="Jan-Willem Spuij">
+// Copyright (c) Jan-Willem Spuij.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+// </copyright>
 
 namespace Mac.Digital.iOS
 {
-    // The UIApplicationDelegate for the application. This class is responsible for launching the
-    // User Interface of the application, as well as listening (and optionally responding) to
-    // application events from iOS.
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Foundation;
+    using UIKit;
+    using Xamarin.Forms;
+
+    /// <summary>
+    /// Application delegate class.
+    /// </summary>
     [Register("AppDelegate")]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
-        //
-        // This method is invoked when the application has loaded and is ready to run. In this
-        // method you should instantiate the window, load the UI into it and then make the window
-        // visible.
-        //
-        // You have 17 seconds to return from this method, or iOS will terminate your application.
-        //
+        /// <inheritdoc />
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
             global::Xamarin.Forms.Forms.Init();
@@ -29,7 +27,7 @@ namespace Mac.Digital.iOS
             var formsApp = new App();
             formsApp.MainPage = new NavigationPage(formsApp.MainPage);
 
-            LoadApplication(formsApp);
+            this.LoadApplication(formsApp);
 
             return base.FinishedLaunching(app, options);
         }

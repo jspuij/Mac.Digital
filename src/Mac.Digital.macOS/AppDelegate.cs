@@ -1,34 +1,48 @@
-﻿using AppKit;
-using Foundation;
+﻿// <copyright file="AppDelegate.cs" company="Jan-Willem Spuij">
+// Copyright (c) Jan-Willem Spuij.  All rights reserved.
+// Licensed under the MIT License.  See License.txt in the project root for license information.
+// </copyright>
 
 namespace Mac.Digital.macOS
 {
+    using AppKit;
+    using Foundation;
+
+    /// <summary>
+    /// Application delegate class.
+    /// </summary>
     [Register("AppDelegate")]
     public class AppDelegate : Xamarin.Forms.Platform.MacOS.FormsApplicationDelegate
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppDelegate"/> class.
+        /// </summary>
         public AppDelegate()
         {
             var style = NSWindowStyle.Closable | NSWindowStyle.Resizable | NSWindowStyle.Titled;
             var rect = new CoreGraphics.CGRect(200, 1000, 1024, 768);
-            MainWindow = new NSWindow(rect, style, NSBackingStore.Buffered, false)
+            this.MainWindow = new NSWindow(rect, style, NSBackingStore.Buffered, false)
             {
                 Title = "My Application",
                 TitleVisibility = NSWindowTitleVisibility.Visible,
             };
         }
 
+        /// <inheritdoc />
         public override NSWindow MainWindow { get; }
 
+        /// <inheritdoc />
         public override void DidFinishLaunching(NSNotification notification)
         {
             // Menu options to make it easy to press cmd+q to quit the app
-            NSApplication.SharedApplication.MainMenu = MakeMainMenu();
+            NSApplication.SharedApplication.MainMenu = this.MakeMainMenu();
 
             Xamarin.Forms.Forms.Init();
-            LoadApplication(new App());
+            this.LoadApplication(new App());
             base.DidFinishLaunching(notification);
         }
 
+        /// <inheritdoc />
         public override void WillTerminate(NSNotification notification)
         {
             // Insert code here to tear down your application
