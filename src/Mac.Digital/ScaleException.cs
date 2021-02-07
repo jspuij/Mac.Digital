@@ -9,7 +9,10 @@ namespace Mac.Digital
     using System.Collections.Generic;
     using System.Text;
 
-    class ScaleException
+    /// <summary>
+    /// Exception that occurs when interfacing the scale is not successful.
+    /// </summary>
+    internal class ScaleException : Exception
     {
     }
 }
