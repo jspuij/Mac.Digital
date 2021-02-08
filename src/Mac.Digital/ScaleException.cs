@@ -10,9 +10,9 @@ namespace Mac.Digital
     using System.Text;
 
     /// <summary>
-    /// An exception that might occur during a scale operation.
+    /// Exception that occurs when interfacing the scale is not successful.
     /// </summary>
-    public class ScaleException : Exception
+    internal class ScaleException : Exception
     {
     }
 }

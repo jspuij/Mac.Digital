@@ -1,4 +1,6 @@
-﻿@import "node_modules/bootstrap/scss/bootstrap";
+﻿$theme-colors: ( "primary": #6f4e37, );
+
+@import "node_modules/bootstrap/scss/bootstrap";
 
 
 #blazor-error-ui {
@@ -24,4 +26,14 @@
 {
     width: 200px;
     height: 68px;
+}
+
+body {
+    background-image: url('/_content/Mac.Digital/img/coffeebean.webp');
+    background-size: cover;
+    background-repeat: repeat-y;
+}
+
+.b-layout-content {
+    background-color: rgba(248,249,250, 0.8);
 }
