@@ -88,12 +88,12 @@ namespace Mac.Digital.Services
         /// Sets the temperature offset on the boiler.
         /// </summary>
         /// <remarks>This is used to calibrate the machine.</remarks>
-        /// <param name="targetPressure">The temperature offset in °C. The range is between -5 and +5 °C.</param>
+        /// <param name="targetOffset">The temperature offset in °C. The range is between -5 and +5 °C.</param>
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="BoilerException">Thrown when the boiler is not able to process the command.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the argument is out of range.</exception>
         /// <exception cref="TaskCanceledException">Thrown when the boiler does not respond in time.</exception>
-        Task SetTemperatureOffset(decimal targetPressure, CancellationToken cancellationToken);
+        Task SetTemperatureOffset(decimal targetOffset, CancellationToken cancellationToken);
     }
 }
