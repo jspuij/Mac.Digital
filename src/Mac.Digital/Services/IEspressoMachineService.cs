@@ -47,9 +47,9 @@ namespace Mac.Digital.Services
         IObservable<decimal> HeatExchangerTemperatureOffset { get; }
 
         /// <summary>
-        /// Gets an observable value reporting the preinfusion time in s.
+        /// Gets an observable value reporting the preinfusion time.
         /// </summary>
-        IObservable<decimal> PreInfusionTime { get; }
+        IObservable<TimeSpan> PreInfusionTime { get; }
 
         /// <summary>
         /// Gets an observable value reporting the desired shot weight in grams.
@@ -105,7 +105,7 @@ namespace Mac.Digital.Services
         /// <exception cref="EspressoMachineException">Thrown when the machine is not able to process the command.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when the argument is out of range.</exception>
         /// <exception cref="TaskCanceledException">Thrown when the machine does not respond in time.</exception>
-        Task SetPreinfusionTime(decimal preInfusionTime, CancellationToken cancellationToken);
+        Task SetPreinfusionTime(TimeSpan preInfusionTime, CancellationToken cancellationToken);
 
         /// <summary>
         /// Sets the shot weight.

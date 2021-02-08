@@ -27,7 +27,7 @@ namespace Mac.Digital.Services
         /// <summary>
         /// Gets an observable value indicating the grind time as received from the arduino.
         /// </summary>
-        IObservable<decimal> GrindTime { get; }
+        IObservable<TimeSpan> GrindTime { get; }
 
         /// <summary>
         /// Gets an observable value that indicates progress during a grind operation.
@@ -42,7 +42,7 @@ namespace Mac.Digital.Services
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         /// <exception cref="GrindException">Occurs when the grind time cannot be set.</exception>
         /// <exception cref="TaskCanceledException">Thrown when the grinder does not respond in time.</exception>
-        Task SetGrindTime(decimal grindTime, CancellationToken cancellationToken);
+        Task SetGrindTime(TimeSpan grindTime, CancellationToken cancellationToken);
 
         /// <summary>
         /// Turns the grinder on to grind manually.
