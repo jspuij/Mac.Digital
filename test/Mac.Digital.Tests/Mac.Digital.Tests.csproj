@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mac.Digital\Mac.Digital.csproj" />
+    <PackageReference Include="coverlet.collector" Version="3.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 
