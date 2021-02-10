@@ -47,10 +47,16 @@ namespace Mac.Digital.Services
         IObservable<decimal> TemperatureOffset { get; }
 
         /// <summary>
-        /// Gets an observable value reporting whether the protection circuit
+        /// Gets an observable value reporting whether the protection circuit.
         /// was activated.
         /// </summary>
         IObservable<bool> Protection { get; }
+
+        /// <summary>
+        /// Gets an observable value reporting whether the heating is on.
+        /// was activated.
+        /// </summary>
+        IObservable<bool> Heating { get; }
 
         /// <summary>
         /// Sets the target pressure on the boiler.

@@ -10,10 +10,10 @@ namespace Mac.Digital.Simulation
     using System.Text;
 
     /// <summary>
-    /// Converts saturated steam temperature to pressure and vice versa
-    /// at sea level.
+    /// Converts saturated steam temperature to pressure and vice versa. Note that this is absolute
+    /// pressure. To get a reading relative to atmospheric pressure, substract the atmospheric pressure.
     /// </summary>
-    /// <remarks>See https://link.springer.com/article/10.1134/S0001433809060139 for formula.</remarks>
+    /// <remarks>See https://www.researchgate.net/publication/257830931_A_new_formula_for_saturated_water_steam_pressure_within_the_temperature_range_-25_to_220C for formula.</remarks>
     public static class TemperaturePressureConverter
     {
         private const double A = 19.846d;
@@ -52,7 +52,7 @@ namespace Mac.Digital.Simulation
         /// <summary>
         /// Calculates the temperature in °C based on pressure in millibar.
         /// </summary>
-        /// <remarks>Appriximation as solving is terrible.</remarks>
+        /// <remarks>Appriximation as inverse function is terrible.</remarks>
         /// <param name="pressure">The pressure in millibar.</param>
         /// <returns>The temperature in °C.</returns>
         public static decimal Temperature(decimal pressure)

@@ -7,6 +7,7 @@ namespace Mac.Digital.Simulation
 {
     using System;
     using System.Collections.Generic;
+    using System.Reactive.Linq;
     using System.Reactive.Subjects;
     using System.Text;
     using System.Threading;
@@ -16,7 +17,7 @@ namespace Mac.Digital.Simulation
     /// <summary>
     /// A simulation of all services.
     /// </summary>
-    public class ServiceSimulation : IPowerService, IBoilerService
+    public sealed class ServiceSimulation : IPowerService, IBoilerService, IDisposable
     {
         /// <summary>
         /// The amount of energy neccessary to heat a kg of water 1 °C.
@@ -24,20 +25,36 @@ namespace Mac.Digital.Simulation
         private const decimal JoulesPerKgPerDegreeCelcius = 4168m;
 
         /// <summary>
+        /// Boiler heat loss when idle in °C/s.
+        /// </summary>
+        private const decimal BoilerHeatLoss = 0.00188666666m;
+
+        /// <summary>
         /// Boiler content in kg.
         /// </summary>
         private const decimal BoilerContent = 5m;
 
         /// <summary>
+        /// Protection temperature in °C.
+        /// </summary>
+        private const decimal ProtectionTemperature = 135m;
+
+        /// <summary>
         /// The power of the heating element in watts.
         /// </summary>
-        private const decimal HeatingElementWatts = 1800m;
+        private const int HeatingElementWatts = 1800;
 
         private readonly BehaviorSubject<bool> poweredOn = new BehaviorSubject<bool>(false);
         private readonly BehaviorSubject<decimal> powerInWatts = new BehaviorSubject<decimal>(0);
+        private readonly BehaviorSubject<decimal> pressure = new BehaviorSubject<decimal>(0);
         private readonly BehaviorSubject<decimal> targetPressure = new BehaviorSubject<decimal>(1.20m);
         private readonly BehaviorSubject<decimal> temperature;
-
+        private readonly BehaviorSubject<decimal> pressureOffset = new BehaviorSubject<decimal>(0m);
+        private readonly BehaviorSubject<decimal> temperatureOffset = new BehaviorSubject<decimal>(0m);
+        private readonly BehaviorSubject<bool> protection = new BehaviorSubject<bool>(false);
+        private readonly BehaviorSubject<bool> heating = new BehaviorSubject<bool>(false);
+        private readonly System.Threading.Timer timer;
+        private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Random random = new Random();
 
         /// <summary>
@@ -49,6 +66,53 @@ namespace Mac.Digital.Simulation
 
             // random room temperature between 19.5 and 21.5 °C
             this.temperature = new BehaviorSubject<decimal>(roomTemperature);
+
+            // boiler pressure is a function of temperature.
+            this.temperature.Select(t => TemperaturePressureConverter.Pressure(t)).Subscribe(this.pressure, this.disposeToken.Token);
+
+            this.timer = new Timer(
+                new TimerCallback(o =>
+                {
+                    var pressure = this.pressure.Value + this.pressureOffset.Value;
+                    var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) - 2000) / 100m;
+                    var newTemperature = this.temperature.Value;
+
+                    if (this.poweredOn.Value && !this.protection.Value)
+                    {
+                        if (pressure < this.targetPressure.Value - 0.05m)
+                        {
+                            // turn heating on.
+                            this.heating.OnNext(true);
+                            this.powerInWatts.OnNext(1 + watts);
+                        }
+                        else if (pressure > this.targetPressure.Value + 0.05m)
+                        {
+                            // turn heating off.
+                            this.heating.OnNext(false);
+                            this.powerInWatts.OnNext(1);
+                        }
+
+                        // heat addition by the boiler ellement.
+                        if (this.heating.Value)
+                        {
+                            newTemperature += this.powerInWatts.Value / (BoilerContent * JoulesPerKgPerDegreeCelcius);
+                        }
+
+                        // heat loss.
+                        newTemperature = Math.Max(roomTemperature, newTemperature - BoilerHeatLoss);
+
+                        this.temperature.OnNext(newTemperature);
+
+                        // protection.
+                        if (newTemperature > ProtectionTemperature)
+                        {
+                            this.protection.OnNext(true);
+                        }
+                    }
+                }),
+                null,
+                0,
+                1000);
         }
 
         /// <inheritdoc />
@@ -58,22 +122,34 @@ namespace Mac.Digital.Simulation
         public IObservable<decimal> PowerInWatts => this.powerInWatts;
 
         /// <inheritdoc />
-        public IObservable<decimal> Pressure => throw new NotImplementedException();
+        public IObservable<decimal> Pressure => this.pressure.CombineLatest(this.pressureOffset, (p, o) => p + o);
 
         /// <inheritdoc />
-        public IObservable<decimal> PressureOffset => throw new NotImplementedException();
+        public IObservable<decimal> PressureOffset => this.pressureOffset;
 
         /// <inheritdoc />
         public IObservable<decimal> TargetPressure => this.targetPressure;
 
         /// <inheritdoc />
-        public IObservable<decimal> Temperature => this.temperature;
+        public IObservable<decimal> Temperature => this.temperature.CombineLatest(this.temperatureOffset, (t, o) => t + o);
 
         /// <inheritdoc />
-        public IObservable<decimal> TemperatureOffset => throw new NotImplementedException();
+        public IObservable<decimal> TemperatureOffset => this.temperatureOffset;
 
         /// <inheritdoc />
-        public IObservable<bool> Protection => throw new NotImplementedException();
+        public IObservable<bool> Protection => this.protection;
+
+        /// <inheritdoc />
+        public IObservable<bool> Heating => this.heating;
+
+        /// <summary>
+        /// Cleans up managed and unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.timer.Dispose();
+            this.disposeToken.Cancel();
+        }
 
         /// <inheritdoc />
         public async Task PowerOff(CancellationToken cancellationToken)
@@ -106,21 +182,39 @@ namespace Mac.Digital.Simulation
         }
 
         /// <inheritdoc />
-        public Task SetPressureOffset(decimal targetOffset, CancellationToken cancellationToken)
+        public async Task SetPressureOffset(decimal targetOffset, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await this.CommunicationDelay(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            this.pressureOffset.OnNext(targetOffset);
         }
 
         /// <inheritdoc />
-        public Task SetTargetPressure(decimal targetPressure, CancellationToken cancellationToken)
+        public async Task SetTargetPressure(decimal targetPressure, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await this.CommunicationDelay(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            this.targetPressure.OnNext(targetPressure);
         }
 
         /// <inheritdoc />
-        public Task SetTemperatureOffset(decimal targetOffset, CancellationToken cancellationToken)
+        public async Task SetTemperatureOffset(decimal targetOffset, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await this.CommunicationDelay(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            this.temperatureOffset.OnNext(targetOffset);
         }
 
         /// <summary>
