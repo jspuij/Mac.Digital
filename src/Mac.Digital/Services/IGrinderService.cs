@@ -12,7 +12,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// Interface for controlling the grinder.
     /// </summary>
-    internal interface IGrinderService
+    public interface IGrinderService
     {
         /// <summary>
         /// Gets an observable value indicating whether the grinder is powered on.

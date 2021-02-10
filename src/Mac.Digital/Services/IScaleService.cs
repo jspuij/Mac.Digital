@@ -17,7 +17,7 @@ namespace Mac.Digital.Services
     /// <remarks>Note that the scale is used internally by the arduino as well
     /// to auto stop an espresso shot. This is not done by the C# code in any
     /// way.</remarks>
-    internal interface IScaleService
+    public interface IScaleService
     {
         /// <summary>
         /// Gets an observable value indicating the weight in grams currently

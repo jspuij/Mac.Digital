@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// An exception that occurs when the boiler does not function.
     /// </summary>
-    internal class BoilerException : Exception
+    public class BoilerException : Exception
     {
     }
 }

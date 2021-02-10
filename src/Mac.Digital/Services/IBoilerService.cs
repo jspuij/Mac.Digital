@@ -19,7 +19,7 @@ namespace Mac.Digital.Services
     /// resettable through software though. There is also a hardware Clixon that
     /// will trigger at 150 °C but then something has gone really wrong, it should
     /// never trigger.</remarks>
-    internal interface IBoilerService
+    public interface IBoilerService
     {
         /// <summary>
         /// Gets an observable value reporting the boiler pressure in bar.

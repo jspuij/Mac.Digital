@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// An exception that occurs when the grinder does not function.
     /// </summary>
-    internal class GrindException : Exception
+    public class GrindException : Exception
     {
     }
 }

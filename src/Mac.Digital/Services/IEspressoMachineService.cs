@@ -14,7 +14,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// Interface for controlling the MacDigital espresso machine.
     /// </summary>
-    internal interface IEspressoMachineService
+    public interface IEspressoMachineService
     {
         /// <summary>
         /// Gets an observable value reporting the water pressure in bar.

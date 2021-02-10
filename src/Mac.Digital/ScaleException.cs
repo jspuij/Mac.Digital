@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// Exception that occurs when interfacing the scale is not successful.
     /// </summary>
-    internal class ScaleException : Exception
+    public class ScaleException : Exception
     {
     }
 }

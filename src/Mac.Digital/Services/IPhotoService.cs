@@ -15,7 +15,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// A service for managing photos.
     /// </summary>
-    internal interface IPhotoService
+    public interface IPhotoService
     {
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> of <see cref="Photo"/>.

@@ -12,7 +12,7 @@ namespace Mac.Digital.Models
     /// <summary>
     /// A photo that belongs to a recipe.
     /// </summary>
-    internal class Photo
+    public class Photo
     {
         /// <summary>
         /// Gets or sets the unique Id for the photo.

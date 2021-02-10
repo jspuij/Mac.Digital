@@ -10,7 +10,7 @@ namespace Mac.Digital
     /// <summary>
     /// An Exception that is thrown when something goes wrong when turning on or turning off the machine.
     /// </summary>
-    internal class PowerException : Exception
+    public class PowerException : Exception
     {
     }
 }

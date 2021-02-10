@@ -9,10 +9,12 @@ namespace Mac.Digital
     using Blazorise;
     using Blazorise.Bootstrap;
     using Blazorise.Icons.FontAwesome;
+    using Mac.Digital.Policies;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
     using Microsoft.MobileBlazorBindings;
+    using Polly;
     using Xamarin.Essentials;
     using Xamarin.Forms;
 
@@ -40,6 +42,10 @@ namespace Mac.Digital
                     })
                     .AddBootstrapProviders()
                     .AddFontAwesomeIcons();
+
+                    // Default command timeout is 3 seconds.
+                    services.AddSingleton<ICommandPolicyProvider>(s
+                        => new DelegateCommandPolicyProvider(() => Policy.TimeoutAsync(3)));
                 })
                 .UseWebRoot("wwwroot");
 

@@ -12,7 +12,7 @@ namespace Mac.Digital.Models
     /// <summary>
     /// A coffee recipe.
     /// </summary>
-    internal class Recipe
+    public class Recipe
     {
         /// <summary>
         /// Gets or sets the unique Id for the recipe.

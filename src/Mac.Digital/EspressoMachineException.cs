@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// An exception that occurs when the espresso machine does not function.
     /// </summary>
-    internal class EspressoMachineException : Exception
+    public class EspressoMachineException : Exception
     {
     }
 }

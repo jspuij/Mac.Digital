@@ -14,7 +14,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// Interface to perform some maintenance on the machine.
     /// </summary>
-    internal interface IMaintenanceService
+    public interface IMaintenanceService
     {
         /// <summary>
         /// Gets an observable value indicating the progress of the maintenance process.

@@ -14,7 +14,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// Interface for a Service to power on and power off the machine.
     /// </summary>
-    internal interface IPowerService
+    public interface IPowerService
     {
         /// <summary>
         /// Gets an observable value indicating whether the machine is powered on.

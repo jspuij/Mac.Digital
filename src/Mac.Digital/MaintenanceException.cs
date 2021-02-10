@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// Exception that might occur during maintenance.
     /// </summary>
-    internal class MaintenanceException : Exception
+    public class MaintenanceException : Exception
     {
     }
 }

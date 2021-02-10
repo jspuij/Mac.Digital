@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// An enum communicating the brew state.
     /// </summary>
-    internal enum BrewState
+    public enum BrewState
     {
         /// <summary>
         /// The machine is idle.

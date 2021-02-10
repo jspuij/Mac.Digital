@@ -13,7 +13,7 @@ namespace Mac.Digital
     /// Enumeration that indicates the state
     /// during the Blindflush routine.
     /// </summary>
-    internal enum BlindFlushState
+    public enum BlindFlushState
     {
         /// <summary>
         /// Routine is not running.

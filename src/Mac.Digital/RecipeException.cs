@@ -12,7 +12,7 @@ namespace Mac.Digital
     /// <summary>
     /// An exception that occurs during handling of a recipe.
     /// </summary>
-    internal class RecipeException : Exception
+    public class RecipeException : Exception
     {
     }
 }

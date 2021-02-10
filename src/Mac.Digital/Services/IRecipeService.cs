@@ -15,7 +15,7 @@ namespace Mac.Digital.Services
     /// <summary>
     /// A service for managing recipes.
     /// </summary>
-    internal interface IRecipeService
+    public interface IRecipeService
     {
         /// <summary>
         /// Gets an <see cref="IEnumerable{T}"/> of <see cref="Recipe"/>.
