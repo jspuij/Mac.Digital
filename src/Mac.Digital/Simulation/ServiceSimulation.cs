@@ -27,7 +27,7 @@ namespace Mac.Digital.Simulation
         /// <summary>
         /// Boiler heat loss when idle in °C/s.
         /// </summary>
-        private const decimal BoilerHeatLoss = 0.00188666666m;
+        private const decimal BoilerHeatLoss = 0.0088666666m;
 
         /// <summary>
         /// Boiler content in kg.
@@ -56,6 +56,7 @@ namespace Mac.Digital.Simulation
         private readonly System.Threading.Timer timer;
         private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Random random = new Random();
+        private readonly BehaviorSubject<int> tick = new BehaviorSubject<int>(0);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceSimulation"/> class.
@@ -63,29 +64,29 @@ namespace Mac.Digital.Simulation
         public ServiceSimulation()
         {
             var roomTemperature = this.random.Next(195, 215) / 10m;
+            var atmosphericPressure = this.random.Next(1000, 1026) / 1000m;
 
             // random room temperature between 19.5 and 21.5 °C
             this.temperature = new BehaviorSubject<decimal>(roomTemperature);
 
             // boiler pressure is a function of temperature.
-            this.temperature.Select(t => TemperaturePressureConverter.Pressure(t)).Subscribe(this.pressure, this.disposeToken.Token);
+            this.temperature.Select(t => Math.Max(0, TemperaturePressureConverter.Pressure(t) - atmosphericPressure)).DistinctUntilChanged().Subscribe(this.pressure, this.disposeToken.Token);
 
             this.timer = new Timer(
                 new TimerCallback(o =>
                 {
                     var pressure = this.pressure.Value + this.pressureOffset.Value;
-                    var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) - 2000) / 100m;
+                    var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) + 2000) / 100m;
                     var newTemperature = this.temperature.Value;
 
                     if (this.poweredOn.Value && !this.protection.Value)
                     {
-                        if (pressure < this.targetPressure.Value - 0.05m)
+                        if (pressure < this.targetPressure.Value - 0.03m)
                         {
                             // turn heating on.
                             this.heating.OnNext(true);
-                            this.powerInWatts.OnNext(1 + watts);
                         }
-                        else if (pressure > this.targetPressure.Value + 0.05m)
+                        else if (pressure > this.targetPressure.Value + 0.03m)
                         {
                             // turn heating off.
                             this.heating.OnNext(false);
@@ -95,6 +96,7 @@ namespace Mac.Digital.Simulation
                         // heat addition by the boiler ellement.
                         if (this.heating.Value)
                         {
+                            this.powerInWatts.OnNext(1 + watts);
                             newTemperature += this.powerInWatts.Value / (BoilerContent * JoulesPerKgPerDegreeCelcius);
                         }
 
@@ -109,20 +111,22 @@ namespace Mac.Digital.Simulation
                             this.protection.OnNext(true);
                         }
                     }
+
+                    this.tick.OnNext(this.tick.Value + 1);
                 }),
                 null,
                 0,
-                1000);
+                10);
         }
 
         /// <inheritdoc />
-        public IObservable<bool> PoweredOn => this.poweredOn;
+        public IObservable<bool> PoweredOn => this.poweredOn.DistinctUntilChanged();
 
         /// <inheritdoc />
-        public IObservable<decimal> PowerInWatts => this.powerInWatts;
+        public IObservable<decimal> PowerInWatts => this.powerInWatts.DistinctUntilChanged();
 
         /// <inheritdoc />
-        public IObservable<decimal> Pressure => this.pressure.CombineLatest(this.pressureOffset, (p, o) => p + o);
+        public IObservable<decimal> Pressure => this.pressure.CombineLatest(this.pressureOffset, (p, o) => Math.Round(p + o, 3)).DistinctUntilChanged();
 
         /// <inheritdoc />
         public IObservable<decimal> PressureOffset => this.pressureOffset;
@@ -131,16 +135,21 @@ namespace Mac.Digital.Simulation
         public IObservable<decimal> TargetPressure => this.targetPressure;
 
         /// <inheritdoc />
-        public IObservable<decimal> Temperature => this.temperature.CombineLatest(this.temperatureOffset, (t, o) => t + o);
+        public IObservable<decimal> Temperature => this.temperature.CombineLatest(this.temperatureOffset, (t, o) => Math.Round(t + o, 2)).DistinctUntilChanged();
 
         /// <inheritdoc />
         public IObservable<decimal> TemperatureOffset => this.temperatureOffset;
 
         /// <inheritdoc />
-        public IObservable<bool> Protection => this.protection;
+        public IObservable<bool> Protection => this.protection.DistinctUntilChanged();
 
         /// <inheritdoc />
-        public IObservable<bool> Heating => this.heating;
+        public IObservable<bool> Heating => this.heating.DistinctUntilChanged();
+
+        /// <summary>
+        /// Gets an observable value indicating the tick.
+        /// </summary>
+        public IObservable<int> Tick => this.tick;
 
         /// <summary>
         /// Cleans up managed and unmanaged resources.
@@ -176,9 +185,15 @@ namespace Mac.Digital.Simulation
         }
 
         /// <inheritdoc />
-        public Task ResetProtection(CancellationToken cancellationToken)
+        public async Task ResetProtection(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await this.CommunicationDelay(cancellationToken);
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return;
+            }
+
+            this.protection.OnNext(false);
         }
 
         /// <inheritdoc />
