@@ -9,6 +9,7 @@ namespace Mac.Digital.Tests.Simulation
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
+    using FluentAssertions;
     using Mac.Digital.Simulation;
     using Xunit;
     using Xunit.Abstractions;
@@ -33,145 +34,165 @@ namespace Mac.Digital.Tests.Simulation
         }
 
         /// <summary>
-        /// Can Constructe.
+        /// Can Construct an instance of the simulation model.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
-        public async Task CanConstruct()
+        public void CanConstruct()
         {
             var instance = new ServiceSimulation();
-
-            instance.PowerInWatts.Subscribe(p => this.output.WriteLine($"Power: {p}"));
-            instance.Temperature.Subscribe(t => this.output.WriteLine($"Temperature: {t}"));
-            instance.Pressure.Subscribe(p => this.output.WriteLine($"Pressure: {p}"));
-            instance.Tick.Subscribe(t => this.output.WriteLine($"Tick: {t}"));
-
-            await instance.PowerOn(CancellationToken.None);
-            await Task.Delay(50 * 1000);
-            Assert.NotNull(instance);
+            instance.Should().NotBeNull();
         }
 
-/*
+        /// <summary>
+        /// Can call dispose.
+        /// </summary>
         [Fact]
         public void CanCallDispose()
         {
-            testClass.Dispose();
-            Assert.True(false, "Create or modify test");
+            Action act = () => this.testClass.Dispose();
+            act.Should().NotThrow();
         }
 
+        /// <summary>
+        /// Can call PowerOff.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public async Task CanCallPowerOff()
         {
+            bool powerOffCalled = false;
+
             var cancellationToken = CancellationToken.None;
-            await testClass.PowerOff(cancellationToken);
-            Assert.True(false, "Create or modify test");
+            this.testClass.PoweredOn.Subscribe(x =>
+            {
+                if (!x)
+                {
+                    powerOffCalled = true;
+                }
+            });
+            await this.testClass.PowerOff(cancellationToken);
+            powerOffCalled.Should().BeTrue();
         }
 
+        /// <summary>
+        /// Can call PowerOn.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public async Task CanCallPowerOn()
         {
+            bool powerOnCalled = false;
+
             var cancellationToken = CancellationToken.None;
-            await testClass.PowerOn(cancellationToken);
-            Assert.True(false, "Create or modify test");
+            this.testClass.PoweredOn.Subscribe(x =>
+            {
+                if (x)
+                {
+                    powerOnCalled = true;
+                }
+            });
+            await this.testClass.PowerOn(cancellationToken);
+            powerOnCalled.Should().BeTrue();
         }
 
-        [Fact]
-        public async Task CanCallResetProtection()
-        {
-            var cancellationToken = CancellationToken.None;
-            await testClass.ResetProtection(cancellationToken);
-            Assert.True(false, "Create or modify test");
-        }
+        /*
+                [Fact]
+                public async Task CanCallResetProtection()
+                {
+                    var cancellationToken = CancellationToken.None;
+                    await testClass.ResetProtection(cancellationToken);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public async Task CanCallSetPressureOffset()
-        {
-            var targetOffset = 524142241.92M;
-            var cancellationToken = CancellationToken.None;
-            await testClass.SetPressureOffset(targetOffset, cancellationToken);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public async Task CanCallSetPressureOffset()
+                {
+                    var targetOffset = 524142241.92M;
+                    var cancellationToken = CancellationToken.None;
+                    await testClass.SetPressureOffset(targetOffset, cancellationToken);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public async Task CanCallSetTargetPressure()
-        {
-            var targetPressure = 1379525623.74M;
-            var cancellationToken = CancellationToken.None;
-            await testClass.SetTargetPressure(targetPressure, cancellationToken);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public async Task CanCallSetTargetPressure()
+                {
+                    var targetPressure = 1379525623.74M;
+                    var cancellationToken = CancellationToken.None;
+                    await testClass.SetTargetPressure(targetPressure, cancellationToken);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public async Task CanCallSetTemperatureOffset()
-        {
-            var targetOffset = 939574617.3M;
-            var cancellationToken = CancellationToken.None;
-            await testClass.SetTemperatureOffset(targetOffset, cancellationToken);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public async Task CanCallSetTemperatureOffset()
+                {
+                    var targetOffset = 939574617.3M;
+                    var cancellationToken = CancellationToken.None;
+                    await testClass.SetTemperatureOffset(targetOffset, cancellationToken);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetPoweredOn()
-        {
-            Assert.IsType<IObservable<bool>>(testClass.PoweredOn);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetPoweredOn()
+                {
+                    Assert.IsType<IObservable<bool>>(testClass.PoweredOn);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetPowerInWatts()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.PowerInWatts);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetPowerInWatts()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.PowerInWatts);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetPressure()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.Pressure);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetPressure()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.Pressure);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetPressureOffset()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.PressureOffset);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetPressureOffset()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.PressureOffset);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetTargetPressure()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.TargetPressure);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetTargetPressure()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.TargetPressure);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetTemperature()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.Temperature);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetTemperature()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.Temperature);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetTemperatureOffset()
-        {
-            Assert.IsType<IObservable<decimal>>(testClass.TemperatureOffset);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetTemperatureOffset()
+                {
+                    Assert.IsType<IObservable<decimal>>(testClass.TemperatureOffset);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetProtection()
-        {
-            Assert.IsType<IObservable<bool>>(testClass.Protection);
-            Assert.True(false, "Create or modify test");
-        }
+                [Fact]
+                public void CanGetProtection()
+                {
+                    Assert.IsType<IObservable<bool>>(testClass.Protection);
+                    Assert.True(false, "Create or modify test");
+                }
 
-        [Fact]
-        public void CanGetHeating()
-        {
-            Assert.IsType<IObservable<bool>>(testClass.Heating);
-            Assert.True(false, "Create or modify test");
-        }
-*/
+                [Fact]
+                public void CanGetHeating()
+                {
+                    Assert.IsType<IObservable<bool>>(testClass.Heating);
+                    Assert.True(false, "Create or modify test");
+                }
+        */
     }
 }
