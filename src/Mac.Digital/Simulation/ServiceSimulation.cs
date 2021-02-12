@@ -57,12 +57,14 @@ namespace Mac.Digital.Simulation
         private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
         private readonly Random random = new Random();
         private readonly BehaviorSubject<int> tick = new BehaviorSubject<int>(0);
+        private readonly SynchronizationContext synchronizationContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceSimulation"/> class.
         /// </summary>
-        public ServiceSimulation()
-            : this(false, 0m, 0m, 0m, 0m, false)
+        /// <param name="synchronizationContext">The synchronization Context to use.</param>
+        public ServiceSimulation(SynchronizationContext synchronizationContext)
+            : this(1000, false, 0m, 0m, 0m, 0m, false)
         {
         }
 
@@ -70,6 +72,8 @@ namespace Mac.Digital.Simulation
         /// Initializes a new instance of the <see cref="ServiceSimulation"/> class with
         /// the specified initial values.
         /// </summary>
+        /// <param name="synchronizationContext">The synchronization Context to use.</param>
+        /// <param name="tickDuration">Tick duration in ms.</param>
         /// <param name="power">Initial power.</param>
         /// <param name="temperature">Initial temperature.</param>
         /// <param name="targetPressure">Initial target pressure.</param>
@@ -77,6 +81,8 @@ namespace Mac.Digital.Simulation
         /// <param name="temperatureOffset">Initial temperature offset.</param>
         /// <param name="protection">Initial protection.</param>
         public ServiceSimulation(
+            SynchronizationContext synchronizationContext,
+            int tickDuration,
             bool power,
             decimal temperature,
             decimal targetPressure,
@@ -105,57 +111,60 @@ namespace Mac.Digital.Simulation
             this.temperature.Select(t => Math.Max(0, TemperaturePressureConverter.Pressure(t) - atmosphericPressure)).DistinctUntilChanged().Subscribe(this.pressure, this.disposeToken.Token);
 
             this.timer = new Timer(
-                new TimerCallback(o =>
-                {
-                    var pressure = this.pressure.Value + this.pressureOffset.Value;
-                    var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) + 2000) / 100m;
-                    var newTemperature = this.temperature.Value;
-
-                    if (this.poweredOn.Value && !this.protection.Value)
+                o => this.synchronizationContext.Post(
+                    oo =>
                     {
-                        if (pressure < this.targetPressure.Value - 0.03m)
+                        var pressure = this.pressure.Value + this.pressureOffset.Value;
+                        var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) + 2000) / 100m;
+                        var newTemperature = this.temperature.Value;
+
+                        if (this.poweredOn.Value && !this.protection.Value)
                         {
-                            // turn heating on.
-                            this.heating.OnNext(true);
+                            if (pressure < this.targetPressure.Value - 0.03m)
+                            {
+                                // turn heating on.
+                                this.heating.OnNext(true);
+                            }
+                            else if (pressure > this.targetPressure.Value + 0.03m)
+                            {
+                                // turn heating off.
+                                this.heating.OnNext(false);
+                                this.powerInWatts.OnNext(1);
+                            }
+
+                            // heat addition by the boiler ellement.
+                            if (this.heating.Value)
+                            {
+                                this.powerInWatts.OnNext(1 + watts);
+                                newTemperature += this.powerInWatts.Value / (BoilerContent * JoulesPerKgPerDegreeCelcius);
+                            }
+
+                            // protection.
+                            if (newTemperature > ProtectionTemperature)
+                            {
+                                this.protection.OnNext(true);
+                            }
                         }
-                        else if (pressure > this.targetPressure.Value + 0.03m)
+
+                        // turn off heating in case of protection.
+                        if (this.heating.Value && this.protection.Value)
                         {
-                            // turn heating off.
                             this.heating.OnNext(false);
                             this.powerInWatts.OnNext(1);
                         }
 
-                        // heat addition by the boiler ellement.
-                        if (this.heating.Value)
-                        {
-                            this.powerInWatts.OnNext(1 + watts);
-                            newTemperature += this.powerInWatts.Value / (BoilerContent * JoulesPerKgPerDegreeCelcius);
-                        }
+                        // heat loss.
+                        newTemperature = Math.Max(roomTemperature, newTemperature - BoilerHeatLoss);
 
-                        // protection.
-                        if (newTemperature > ProtectionTemperature)
-                        {
-                            this.protection.OnNext(true);
-                        }
-                    }
+                        this.temperature.OnNext(newTemperature);
 
-                    // turn off heating in case of protection.
-                    if (this.heating.Value && this.protection.Value)
-                    {
-                        this.heating.OnNext(false);
-                        this.powerInWatts.OnNext(1);
-                    }
-
-                    // heat loss.
-                    newTemperature = Math.Max(roomTemperature, newTemperature - BoilerHeatLoss);
-
-                    this.temperature.OnNext(newTemperature);
-
-                    this.tick.OnNext(this.tick.Value + 1);
-                }),
+                        this.tick.OnNext(this.tick.Value + 1);
+                    },
+                    null),
                 null,
                 0,
-                10);
+                tickDuration);
+            this.synchronizationContext = synchronizationContext ?? throw new ArgumentNullException(nameof(synchronizationContext));
         }
 
         /// <inheritdoc />
