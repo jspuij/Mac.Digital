@@ -44,14 +44,14 @@ namespace Mac.Digital.Simulation
         /// </summary>
         private const int HeatingElementWatts = 1800;
 
-        private readonly BehaviorSubject<bool> poweredOn = new BehaviorSubject<bool>(false);
+        private readonly BehaviorSubject<bool> poweredOn;
         private readonly BehaviorSubject<decimal> powerInWatts = new BehaviorSubject<decimal>(0);
-        private readonly BehaviorSubject<decimal> pressure = new BehaviorSubject<decimal>(0);
-        private readonly BehaviorSubject<decimal> targetPressure = new BehaviorSubject<decimal>(1.20m);
+        private readonly BehaviorSubject<decimal> pressure;
+        private readonly BehaviorSubject<decimal> targetPressure;
         private readonly BehaviorSubject<decimal> temperature;
-        private readonly BehaviorSubject<decimal> pressureOffset = new BehaviorSubject<decimal>(0m);
-        private readonly BehaviorSubject<decimal> temperatureOffset = new BehaviorSubject<decimal>(0m);
-        private readonly BehaviorSubject<bool> protection = new BehaviorSubject<bool>(false);
+        private readonly BehaviorSubject<decimal> pressureOffset;
+        private readonly BehaviorSubject<decimal> temperatureOffset;
+        private readonly BehaviorSubject<bool> protection;
         private readonly BehaviorSubject<bool> heating = new BehaviorSubject<bool>(false);
         private readonly System.Threading.Timer timer;
         private readonly CancellationTokenSource disposeToken = new CancellationTokenSource();
@@ -62,12 +62,44 @@ namespace Mac.Digital.Simulation
         /// Initializes a new instance of the <see cref="ServiceSimulation"/> class.
         /// </summary>
         public ServiceSimulation()
+            : this(false, 0m, 0m, 0m, 0m, false)
         {
-            var roomTemperature = this.random.Next(195, 215) / 10m;
-            var atmosphericPressure = this.random.Next(1000, 1026) / 1000m;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceSimulation"/> class with
+        /// the specified initial values.
+        /// </summary>
+        /// <param name="power">Initial power.</param>
+        /// <param name="temperature">Initial temperature.</param>
+        /// <param name="targetPressure">Initial target pressure.</param>
+        /// <param name="pressureOffset">Initial target pressure offset.</param>
+        /// <param name="temperatureOffset">Initial temperature offset.</param>
+        /// <param name="protection">Initial protection.</param>
+        public ServiceSimulation(
+            bool power,
+            decimal temperature,
+            decimal targetPressure,
+            decimal pressureOffset,
+            decimal temperatureOffset,
+            bool protection)
+        {
+            this.poweredOn = new BehaviorSubject<bool>(power);
+            this.pressure = new BehaviorSubject<decimal>(temperature);
+            this.targetPressure = new BehaviorSubject<decimal>(targetPressure);
+            this.pressureOffset = new BehaviorSubject<decimal>(pressureOffset);
+            this.temperatureOffset = new BehaviorSubject<decimal>(temperatureOffset);
+            this.protection = new BehaviorSubject<bool>(protection);
+            this.heating = new BehaviorSubject<bool>(false);
 
             // random room temperature between 19.5 and 21.5 °C
-            this.temperature = new BehaviorSubject<decimal>(roomTemperature);
+            var roomTemperature = this.random.Next(195, 215) / 10m;
+
+            // random atmospheric pressure between 1000 and 1026.
+            var atmosphericPressure = this.random.Next(1000, 1026) / 1000m;
+
+            // either choose room temperature or initial temperature, whichever is higher.
+            this.temperature = new BehaviorSubject<decimal>(Math.Max(temperature, roomTemperature));
 
             // boiler pressure is a function of temperature.
             this.temperature.Select(t => Math.Max(0, TemperaturePressureConverter.Pressure(t) - atmosphericPressure)).DistinctUntilChanged().Subscribe(this.pressure, this.disposeToken.Token);
@@ -100,17 +132,24 @@ namespace Mac.Digital.Simulation
                             newTemperature += this.powerInWatts.Value / (BoilerContent * JoulesPerKgPerDegreeCelcius);
                         }
 
-                        // heat loss.
-                        newTemperature = Math.Max(roomTemperature, newTemperature - BoilerHeatLoss);
-
-                        this.temperature.OnNext(newTemperature);
-
                         // protection.
                         if (newTemperature > ProtectionTemperature)
                         {
                             this.protection.OnNext(true);
                         }
                     }
+
+                    // turn off heating in case of protection.
+                    if (this.heating.Value && this.protection.Value)
+                    {
+                        this.heating.OnNext(false);
+                        this.powerInWatts.OnNext(1);
+                    }
+
+                    // heat loss.
+                    newTemperature = Math.Max(roomTemperature, newTemperature - BoilerHeatLoss);
+
+                    this.temperature.OnNext(newTemperature);
 
                     this.tick.OnNext(this.tick.Value + 1);
                 }),
@@ -163,6 +202,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task PowerOff(CancellationToken cancellationToken)
         {
+            if (!this.poweredOn.Value)
+            {
+                return;
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {
@@ -175,6 +219,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task PowerOn(CancellationToken cancellationToken)
         {
+            if (this.poweredOn.Value)
+            {
+                return;
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {
@@ -187,6 +236,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task ResetProtection(CancellationToken cancellationToken)
         {
+            if (!this.protection.Value)
+            {
+                return;
+            }
+
             if (this.temperature.Value > ProtectionTemperature)
             {
                 throw new BoilerException(string.Format(Properties.Resources.ProtectionTemperatureExceeded, ProtectionTemperature));
@@ -204,6 +258,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task SetPressureOffset(decimal targetOffset, CancellationToken cancellationToken)
         {
+            if (targetOffset >= 1.000m || targetOffset <= -1.000m)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetOffset));
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {
@@ -216,6 +275,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task SetTargetPressure(decimal targetPressure, CancellationToken cancellationToken)
         {
+            if (targetPressure >= 2.000m || targetPressure <= 0.000m)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetPressure));
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {
@@ -228,6 +292,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task SetTemperatureOffset(decimal targetOffset, CancellationToken cancellationToken)
         {
+            if (targetOffset >= 5.000m || targetOffset <= -5.000m)
+            {
+                throw new ArgumentOutOfRangeException(nameof(targetOffset));
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {

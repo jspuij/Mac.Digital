@@ -44,6 +44,22 @@ namespace Mac.Digital.Tests.Simulation
         }
 
         /// <summary>
+        /// Can Construct an instance of the simulation model with arguments.
+        /// </summary>
+        [Fact]
+        public void CanConstructWithArguments()
+        {
+            var instance = new ServiceSimulation(
+                false,
+                0m,
+                1.3m,
+                0.1m,
+                0.1m,
+                true);
+            instance.Should().NotBeNull();
+        }
+
+        /// <summary>
         /// Can call dispose.
         /// </summary>
         [Fact]
@@ -63,14 +79,23 @@ namespace Mac.Digital.Tests.Simulation
             bool powerOffCalled = false;
 
             var cancellationToken = CancellationToken.None;
-            this.testClass.PoweredOn.Subscribe(x =>
+
+            var instance = new ServiceSimulation(
+             true,
+             0m,
+             1.3m,
+             0.0m,
+             0.0m,
+             false);
+
+            instance.PoweredOn.Subscribe(x =>
             {
                 if (!x)
                 {
                     powerOffCalled = true;
                 }
             });
-            await this.testClass.PowerOff(cancellationToken);
+            await instance.PowerOff(cancellationToken);
             powerOffCalled.Should().BeTrue();
         }
 
@@ -95,24 +120,143 @@ namespace Mac.Digital.Tests.Simulation
             powerOnCalled.Should().BeTrue();
         }
 
-        /*
-
+        /// <summary>
+        /// Can call reset protection.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
         public async Task CanCallResetProtection()
         {
+            bool resetCalled = false;
+
             var cancellationToken = CancellationToken.None;
-            await testClass.ResetProtection(cancellationToken);
-            Assert.True(false, "Create or modify test");
+
+            var instance = new ServiceSimulation(
+               true,
+               0m,
+               1.3m,
+               0.0m,
+               0.0m,
+               true);
+
+            instance.Protection.Subscribe(x =>
+            {
+                if (!x)
+                {
+                    resetCalled = true;
+                }
+            });
+
+            await instance.ResetProtection(cancellationToken);
+            resetCalled.Should().BeTrue();
         }
 
-                [Fact]
-                public async Task CanCallSetPressureOffset()
+        /// <summary>
+        /// Cannot call reset protection when temperature is still to high.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task CannotCallResetProtectionTooHighTemperature()
+        {
+            bool resetCalled = false;
+
+            var cancellationToken = CancellationToken.None;
+
+            var instance = new ServiceSimulation(
+               true,
+               140m,
+               1.3m,
+               0.0m,
+               0.0m,
+               true);
+
+            instance.Protection.Subscribe(x =>
+            {
+                if (!x)
                 {
-                    var targetOffset = 524142241.92M;
-                    var cancellationToken = CancellationToken.None;
-                    await testClass.SetPressureOffset(targetOffset, cancellationToken);
-                    Assert.True(false, "Create or modify test");
+                    resetCalled = true;
                 }
+            });
+
+            Func<Task> act = () => instance.ResetProtection(cancellationToken);
+
+            await act.Should().ThrowAsync<BoilerException>();
+            resetCalled.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Can call SetPressureOffset.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task CanCallSetPressureOffset()
+        {
+            decimal actualPressure = 0m;
+            decimal actualOffset = 0m;
+
+            // make sure it's off.
+            await this.testClass.PowerOff(CancellationToken.None);
+
+            this.testClass.Pressure.Subscribe(p => actualPressure = p);
+            this.testClass.Pressure.Subscribe(o => actualOffset = o);
+
+            var targetOffset = 0.5m;
+            var cancellationToken = CancellationToken.None;
+
+            await this.testClass.SetPressureOffset(targetOffset, cancellationToken);
+
+            actualPressure.Should().Be(targetOffset);
+            actualOffset.Should().Be(targetOffset);
+        }
+
+        /// <summary>
+        /// Cannot call SetPressureOffset with a too low value.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task CannotCallSetPressureOffsetTooLow()
+        {
+            bool offsetCalled;
+
+            this.testClass.Pressure.Subscribe(_ => offsetCalled = true);
+
+            // make sure it's off.
+            await this.testClass.PowerOff(CancellationToken.None);
+
+            // reset offsetCalled because it's a behaviorsubject that will always trigger.
+            offsetCalled = false;
+
+            Func<Task> act = () => this.testClass.SetPressureOffset(-1m, CancellationToken.None);
+            await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+            offsetCalled.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Cannot call SetPressureOffset with a too high value.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task CannotCallSetPressureOffsetTooHigh()
+        {
+            bool offsetCalled;
+
+            this.testClass.Pressure.Subscribe(_ => offsetCalled = true);
+
+            // make sure it's off.
+            await this.testClass.PowerOff(CancellationToken.None);
+
+            // reset offsetCalled because it's a behaviorsubject that will always trigger.
+            offsetCalled = false;
+
+            Func<Task> act = () => this.testClass.SetPressureOffset(1m, CancellationToken.None);
+            await act.Should().ThrowAsync<ArgumentOutOfRangeException>();
+            offsetCalled.Should().BeFalse();
+        }
+
+        /*
+
+
+
 
                 [Fact]
                 public async Task CanCallSetTargetPressure()
