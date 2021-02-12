@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Mac.Digital.Models.Photo">
+    <Position X="10.75" Y="4.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAACABAAAA=</HashCode>
+      <FileName>Models\Photo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Mac.Digital.Models.Recipe">
+    <Position X="10.75" Y="0.75" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AABiAAAAAgAAAAAAAAAAAAQIAEBQAAAAAAAAAAIEEAA=</HashCode>
+      <FileName>Models\Recipe.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="Mac.Digital.Services.IBoilerService">
+    <Position X="14.5" Y="14.5" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>BYAAAAAAAAAAAAAAAABUAACAAAAAAAAAAAAgAgIEAAA=</HashCode>
+      <FileName>Services\IBoilerService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IEspressoMachineService">
+    <Position X="10.75" Y="6.25" Width="6" />
+    <TypeIdentifier>
+      <HashCode>AAEACEIBACIABAAACAAAAAAAAAAQAAAAKABBAgCAAQA=</HashCode>
+      <FileName>Services\IEspressoMachineService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IGrinderService">
+    <Position X="14.5" Y="11.25" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAIAAACAAAAAAAAAIAAAAAAAAAIIQAAAAACAAAA=</HashCode>
+      <FileName>Services\IGrinderService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IMaintenanceService">
+    <Position X="10.75" Y="15.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAIACgAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>Services\IMaintenanceService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IPhotoService">
+    <Position X="13.75" Y="4.25" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAQAAAAgAAAAAA=</HashCode>
+      <FileName>Services\IPhotoService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IPowerService">
+    <Position X="10.75" Y="11.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAACAAAAAABAAAAAAAAAAAAIAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IPowerService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IRecipeService">
+    <Position X="13.75" Y="0.75" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAAAAAAABABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Services\IRecipeService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Mac.Digital.Services.IScaleService">
+    <Position X="10.75" Y="13.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAEAAAAAgAA=</HashCode>
+      <FileName>Services\IScaleService.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

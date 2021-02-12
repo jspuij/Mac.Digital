@@ -36,11 +36,11 @@ namespace Mac.Digital.Services
         Task PowerOn(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Turns the machine on.
+        /// Turns the machine off.
         /// </summary>
         /// <param name="cancellationToken">A token to cancel the operation.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        /// <exception cref="PowerException">Thrown when the machine cannot be turned on.</exception>
+        /// <exception cref="PowerException">Thrown when the machine cannot be turned off.</exception>
         /// <exception cref="TaskCanceledException">Thrown when the machine does not respond in time.</exception>
         Task PowerOff(CancellationToken cancellationToken);
     }

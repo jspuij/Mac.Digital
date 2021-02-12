@@ -187,6 +187,11 @@ namespace Mac.Digital.Simulation
         /// <inheritdoc />
         public async Task ResetProtection(CancellationToken cancellationToken)
         {
+            if (this.temperature.Value > ProtectionTemperature)
+            {
+                throw new BoilerException(string.Format(Properties.Resources.ProtectionTemperatureExceeded, ProtectionTemperature));
+            }
+
             await this.CommunicationDelay(cancellationToken);
             if (cancellationToken.IsCancellationRequested)
             {

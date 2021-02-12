@@ -21,7 +21,7 @@ namespace Mac.Digital.Tests.Simulation
     public class ServiceSimulationTests
     {
         private readonly ITestOutputHelper output;
-        private ServiceSimulation testClass;
+        private readonly ServiceSimulation testClass;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceSimulationTests"/> class.
@@ -96,13 +96,14 @@ namespace Mac.Digital.Tests.Simulation
         }
 
         /*
-                [Fact]
-                public async Task CanCallResetProtection()
-                {
-                    var cancellationToken = CancellationToken.None;
-                    await testClass.ResetProtection(cancellationToken);
-                    Assert.True(false, "Create or modify test");
-                }
+
+        [Fact]
+        public async Task CanCallResetProtection()
+        {
+            var cancellationToken = CancellationToken.None;
+            await testClass.ResetProtection(cancellationToken);
+            Assert.True(false, "Create or modify test");
+        }
 
                 [Fact]
                 public async Task CanCallSetPressureOffset()

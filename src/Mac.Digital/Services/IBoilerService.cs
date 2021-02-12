@@ -16,9 +16,9 @@ namespace Mac.Digital.Services
     /// </summary>
     /// <remarks>There is a protection circuit in the arduino that will protect
     /// the boiler from overheating. This should normally never activate. It is
-    /// resettable through software though. There is also a hardware Clixon that
-    /// will trigger at 150 °C but then something has gone really wrong, it should
-    /// never trigger.</remarks>
+    /// resettable through software though. There is also a hardware thermal
+    /// circuit breaker that will trigger at 135 °C but then something has really
+    /// gone wrong. It should never trigger.</remarks>
     public interface IBoilerService
     {
         /// <summary>
