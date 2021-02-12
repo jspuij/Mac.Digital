@@ -64,7 +64,7 @@ namespace Mac.Digital.Simulation
         /// </summary>
         /// <param name="synchronizationContext">The synchronization Context to use.</param>
         public ServiceSimulation(SynchronizationContext synchronizationContext)
-            : this(1000, false, 0m, 0m, 0m, 0m, false)
+            : this(synchronizationContext, 1000, false, 0m, 1.2m, 0m, 0m, false)
         {
         }
 
@@ -111,8 +111,8 @@ namespace Mac.Digital.Simulation
             this.temperature.Select(t => Math.Max(0, TemperaturePressureConverter.Pressure(t) - atmosphericPressure)).DistinctUntilChanged().Subscribe(this.pressure, this.disposeToken.Token);
 
             this.timer = new Timer(
-                o => this.synchronizationContext.Post(
-                    oo =>
+                _ => this.synchronizationContext.Post(
+                    _ =>
                     {
                         var pressure = this.pressure.Value + this.pressureOffset.Value;
                         var watts = this.random.Next((HeatingElementWatts * 100) - 2000, (HeatingElementWatts * 100) + 2000) / 100m;
@@ -222,7 +222,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.poweredOn.OnNext(false);
+            await this.ExecuteAsync(() =>
+            {
+                this.poweredOn.OnNext(false);
+            });
         }
 
         /// <inheritdoc />
@@ -239,7 +242,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.poweredOn.OnNext(true);
+            await this.ExecuteAsync(() =>
+            {
+                this.poweredOn.OnNext(true);
+            });
         }
 
         /// <inheritdoc />
@@ -261,7 +267,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.protection.OnNext(false);
+            await this.ExecuteAsync(() =>
+            {
+                this.protection.OnNext(false);
+            });
         }
 
         /// <inheritdoc />
@@ -278,7 +287,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.pressureOffset.OnNext(targetOffset);
+            await this.ExecuteAsync(() =>
+            {
+                this.pressureOffset.OnNext(targetOffset);
+            });
         }
 
         /// <inheritdoc />
@@ -295,7 +307,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.targetPressure.OnNext(targetPressure);
+            await this.ExecuteAsync(() =>
+            {
+                this.targetPressure.OnNext(targetPressure);
+            });
         }
 
         /// <inheritdoc />
@@ -312,7 +327,10 @@ namespace Mac.Digital.Simulation
                 return;
             }
 
-            this.temperatureOffset.OnNext(targetOffset);
+            await this.ExecuteAsync(() =>
+            {
+                this.temperatureOffset.OnNext(targetOffset);
+            });
         }
 
         /// <summary>
@@ -323,6 +341,33 @@ namespace Mac.Digital.Simulation
         private async Task CommunicationDelay(CancellationToken cancellationToken)
         {
             await Task.Delay(this.random.Next(100, 300), cancellationToken);
+        }
+
+        /// <summary>
+        /// Execute async on the synchronization context.
+        /// </summary>
+        /// <param name="action">The action to execute.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private Task ExecuteAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            this.synchronizationContext.Post(
+                _ =>
+                {
+                    try
+                    {
+                        action();
+                        tcs.SetResult(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        tcs.SetException(ex);
+                    }
+                },
+                null);
+
+            return tcs.Task;
         }
     }
 }
