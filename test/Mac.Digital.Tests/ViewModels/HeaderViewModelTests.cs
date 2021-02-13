@@ -6,41 +6,42 @@
 namespace Mac.Digital.Tests.ViewModels
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reactive;
+    using System.Reactive.Subjects;
     using FluentAssertions;
     using Mac.Digital.Policies;
     using Mac.Digital.Services;
     using Mac.Digital.ViewModels;
     using Microsoft.AspNetCore.Components;
     using Moq;
+    using Polly;
     using ReactiveUI;
     using Xunit;
 
     /// <summary>
     /// Unit tests for the <see cref="HeaderViewModel"/> class.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class HeaderViewModelTests
     {
-        private readonly HeaderViewModel testClass;
-        private readonly IPowerService powerService;
-        private readonly ITitleService titleService;
-        private readonly ICommandPolicyProvider policyProvider;
-        private readonly NavigationManager navigationManager;
+        private readonly Mock<IPowerService> powerService;
+        private readonly Mock<ITitleService> titleService;
+        private readonly Mock<ICommandPolicyProvider> policyProvider;
+        private readonly Mock<NavigationManager> navigationManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderViewModelTests"/> class.
         /// </summary>
         public HeaderViewModelTests()
         {
-            this.powerService = new Mock<IPowerService>().Object;
-            this.titleService = new Mock<ITitleService>().Object;
-            this.policyProvider = new Mock<ICommandPolicyProvider>().Object;
-            this.navigationManager = new Mock<NavigationManager>().Object;
-            this.testClass = new HeaderViewModel(
-                this.powerService,
-                this.titleService,
-                this.policyProvider,
-                this.navigationManager);
+            this.powerService = new Mock<IPowerService>();
+            this.powerService.Setup(x => x.PoweredOn).Returns(new BehaviorSubject<bool>(false));
+            this.titleService = new Mock<ITitleService>();
+            this.titleService.Setup(x => x.Title).Returns(new BehaviorSubject<string>("Test"));
+            this.policyProvider = new Mock<ICommandPolicyProvider>();
+            this.policyProvider.Setup(x => x.GetPolicy()).Returns(Policy.TimeoutAsync(3));
+            this.navigationManager = new Mock<NavigationManager>();
         }
 
         /// <summary>
@@ -50,10 +51,10 @@ namespace Mac.Digital.Tests.ViewModels
         public void CanConstruct()
         {
             var instance = new HeaderViewModel(
-                this.powerService,
-                this.titleService,
-                this.policyProvider,
-                this.navigationManager);
+                this.powerService.Object,
+                this.titleService.Object,
+                this.policyProvider.Object,
+                this.navigationManager.Object);
             instance.Should().NotBeNull();
         }
 
@@ -65,9 +66,9 @@ namespace Mac.Digital.Tests.ViewModels
         {
             Action act = () => new HeaderViewModel(
                 default,
-                this.titleService,
-                this.policyProvider,
-                this.navigationManager);
+                this.titleService.Object,
+                this.policyProvider.Object,
+                this.navigationManager.Object);
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -79,10 +80,10 @@ namespace Mac.Digital.Tests.ViewModels
         public void CannotConstructWithNullTitleService()
         {
             Action act = () => new HeaderViewModel(
-                this.powerService,
+                this.powerService.Object,
                 default,
-                this.policyProvider,
-                this.navigationManager);
+                this.policyProvider.Object,
+                this.navigationManager.Object);
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -94,10 +95,10 @@ namespace Mac.Digital.Tests.ViewModels
         public void CannotConstructWithNullPolicyProvider()
         {
             Action act = () => new HeaderViewModel(
-                this.powerService,
-                this.titleService,
+                this.powerService.Object,
+                this.titleService.Object,
                 default,
-                this.navigationManager);
+                this.navigationManager.Object);
 
             act.Should().Throw<ArgumentNullException>();
         }
@@ -109,9 +110,9 @@ namespace Mac.Digital.Tests.ViewModels
         public void CannotConstructWithNullNavigationManager()
         {
             Action act = () => new HeaderViewModel(
-                this.powerService,
-                this.titleService,
-                this.policyProvider,
+                this.powerService.Object,
+                this.titleService.Object,
+                this.policyProvider.Object,
                 default);
 
             act.Should().Throw<ArgumentNullException>();
@@ -123,19 +124,33 @@ namespace Mac.Digital.Tests.ViewModels
         [Fact]
         public void CanCallDispose()
         {
-            this.testClass.Dispose();
-            Func<string> act = () => this.testClass.Title;
-            act.Should().Throw<ObjectDisposedException>();
+            var instance = new HeaderViewModel(
+             this.powerService.Object,
+             this.titleService.Object,
+             this.policyProvider.Object,
+             this.navigationManager.Object);
+            Action act = () => instance.Dispose();
+            act.Should().NotThrow();
         }
 
-        /*
+        /// <summary>
+        /// Can get the PoweredOn variable.
+        /// </summary>
         [Fact]
         public void CanGetPoweredOn()
         {
-            Assert.IsType<bool>(test.PoweredOn);
-            Assert.True(false, "Create or modify test");
+            var subject = new BehaviorSubject<bool>(false);
+            this.powerService.Setup(x => x.PoweredOn).Returns(subject);
+            var instance = new HeaderViewModel(
+               this.powerService.Object,
+               this.titleService.Object,
+               this.policyProvider.Object,
+               this.navigationManager.Object);
+            subject.OnNext(true);
+            instance.PoweredOn.Should().BeTrue();
         }
 
+        /*
         [Fact]
         public void CanGetTitle()
         {

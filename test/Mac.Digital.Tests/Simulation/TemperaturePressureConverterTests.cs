@@ -6,6 +6,7 @@
 namespace Mac.Digital.Tests.Simulation
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using FluentAssertions;
     using Mac.Digital.Simulation;
     using Xunit;
@@ -13,6 +14,7 @@ namespace Mac.Digital.Tests.Simulation
     /// <summary>
     /// Unit tests for the <see cref="TemperaturePressureConverter"/> class.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public static class TemperaturePressureConverterTests
     {
         /// <summary>
