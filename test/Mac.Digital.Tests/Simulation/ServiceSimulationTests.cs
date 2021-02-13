@@ -432,58 +432,87 @@ namespace Mac.Digital.Tests.Simulation
             });
         }
 
-        /*
+        /// <summary>
+        /// Can get the heating.
+        /// </summary>
+        [Fact]
+        public void CanGetHeating()
+        {
+            AsyncContext.Run(async () =>
+            {
+                var instance = new ServiceSimulation(SynchronizationContext.Current);
+                bool heating = false;
 
+                instance.Heating.Subscribe(h => heating = h);
 
+                // pre-check
+                heating.Should().BeFalse();
 
-                [Fact]
-                public void CanGetPressure()
-                {
-                    Assert.IsType<IObservable<decimal>>(testClass.Pressure);
-                    Assert.True(false, "Create or modify test");
-                }
+                // test
+                await instance.PowerOn(CancellationToken.None);
 
-                [Fact]
-                public void CanGetPressureOffset()
-                {
-                    Assert.IsType<IObservable<decimal>>(testClass.PressureOffset);
-                    Assert.True(false, "Create or modify test");
-                }
+                // wait at least a tick for the heater to turn on.
+                await Task.Delay(1200);
 
-                [Fact]
-                public void CanGetTargetPressure()
-                {
-                    Assert.IsType<IObservable<decimal>>(testClass.TargetPressure);
-                    Assert.True(false, "Create or modify test");
-                }
+                // assert
+                heating.Should().BeTrue();
+            });
+        }
 
-                [Fact]
-                public void CanGetTemperature()
-                {
-                    Assert.IsType<IObservable<decimal>>(testClass.Temperature);
-                    Assert.True(false, "Create or modify test");
-                }
+        /// <summary>
+        /// Make sure the simulation is running by observing the ticks.
+        /// </summary>
+        [Fact]
+        public void IsRunning()
+        {
+            AsyncContext.Run(async () =>
+            {
+                var instance = new ServiceSimulation(SynchronizationContext.Current);
+                int tick = 0;
 
-                [Fact]
-                public void CanGetTemperatureOffset()
-                {
-                    Assert.IsType<IObservable<decimal>>(testClass.TemperatureOffset);
-                    Assert.True(false, "Create or modify test");
-                }
+                instance.Tick.Subscribe(p => tick = p);
 
-                [Fact]
-                public void CanGetProtection()
-                {
-                    Assert.IsType<IObservable<bool>>(testClass.Protection);
-                    Assert.True(false, "Create or modify test");
-                }
+                // test
+                await instance.PowerOn(CancellationToken.None);
 
-                [Fact]
-                public void CanGetHeating()
-                {
-                    Assert.IsType<IObservable<bool>>(testClass.Heating);
-                    Assert.True(false, "Create or modify test");
-                }
-        */
+                // wait at least a tick for the heater to turn on.
+                await Task.Delay(1200);
+
+                // assert
+                tick.Should().BeGreaterThan(0);
+            });
+        }
+
+        /// <summary>
+        /// Make sure the simulation will trigger the protection when temps are too high.
+        /// </summary>
+        [Fact]
+        public void WillTriggerProtection()
+        {
+            AsyncContext.Run(async () =>
+            {
+                var instance = new ServiceSimulation(
+                    SynchronizationContext.Current,
+                    1000,
+                    true,
+                    150m,
+                    1.2m,
+                    0m,
+                    0m,
+                    false);
+                bool protection = false;
+
+                instance.Protection.Subscribe(p => protection = p);
+
+                // test
+                await instance.PowerOn(CancellationToken.None);
+
+                // wait at least a tick for the protection to kick in.
+                await Task.Delay(1200);
+
+                // assert
+                protection.Should().BeTrue();
+            });
+        }
     }
 }
