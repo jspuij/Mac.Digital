@@ -65,19 +65,19 @@ namespace Mac.Digital.ViewModels
             this.title = titleService.Title.ToProperty(this, x => x.Title);
             var policy = policyProvider.GetPolicy();
 
-            this.TogglePower = ReactiveCommand.CreateFromTask(async () =>
+            this.TogglePower = ReactiveCommand.CreateFromTask(async (ct) =>
             {
                 switch (this.PoweredOn)
                 {
                     case true:
                         await policy.ExecuteAsync(
                             async (token) => await powerService.PowerOff(token),
-                            CancellationToken.None);
+                            ct);
                         break;
                     case false:
                         await policy.ExecuteAsync(
                             async (token) => await powerService.PowerOn(token),
-                            CancellationToken.None);
+                            ct);
                         break;
                 }
             });
