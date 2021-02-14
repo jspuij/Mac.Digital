@@ -137,21 +137,6 @@ namespace Mac.Digital.Tests.ViewModels
         }
 
         /// <summary>
-        /// Can call dispose.
-        /// </summary>
-        [Fact]
-        public void CanCallDispose()
-        {
-            var instance = new HeaderViewModel(
-             this.powerService.Object,
-             this.titleService.Object,
-             this.policyProvider.Object,
-             this.navigationManager);
-            Action act = () => instance.Dispose();
-            act.Should().NotThrow();
-        }
-
-        /// <summary>
         /// Can get the PoweredOn value.
         /// </summary>
         [Fact]
@@ -164,6 +149,8 @@ namespace Mac.Digital.Tests.ViewModels
                this.titleService.Object,
                this.policyProvider.Object,
                this.navigationManager);
+            instance.Activator.Activate();
+
             subject.OnNext(true);
             instance.PoweredOn.Should().BeTrue();
         }
@@ -179,6 +166,8 @@ namespace Mac.Digital.Tests.ViewModels
                this.titleService.Object,
                this.policyProvider.Object,
                this.navigationManager);
+            instance.Activator.Activate();
+
             instance.Title.Should().Be("Test");
         }
 
@@ -193,6 +182,7 @@ namespace Mac.Digital.Tests.ViewModels
               this.titleService.Object,
               this.policyProvider.Object,
               this.navigationManager);
+            instance.Activator.Activate();
 
             ((ICommand)instance.TogglePower).Execute(null);
             instance.PoweredOn.Should().BeTrue();
@@ -227,6 +217,7 @@ namespace Mac.Digital.Tests.ViewModels
               this.titleService.Object,
               this.policyProvider.Object,
               this.navigationManager);
+            instance.Activator.Activate();
 
             ((ICommand)instance.TogglePower).Execute(null);
 
@@ -246,6 +237,8 @@ namespace Mac.Digital.Tests.ViewModels
             this.titleService.Object,
             this.policyProvider.Object,
             this.navigationManager);
+            instance.Activator.Activate();
+
             ((ICommand)instance.Settings).Execute(null);
             this.navigationManager.LastUri.Should().Be("/Settings");
             this.navigationManager.LastForceLoad.Should().BeFalse();

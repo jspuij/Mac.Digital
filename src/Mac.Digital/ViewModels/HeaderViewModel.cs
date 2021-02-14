@@ -7,6 +7,7 @@ namespace Mac.Digital.ViewModels
 {
     using System;
     using System.Reactive;
+    using System.Reactive.Disposables;
     using System.Threading;
     using Mac.Digital.Policies;
     using Mac.Digital.Services;
@@ -16,17 +17,17 @@ namespace Mac.Digital.ViewModels
     /// <summary>
     /// ViewModel for the header component.
     /// </summary>
-    public sealed class HeaderViewModel : ReactiveObject, IDisposable
+    public sealed class HeaderViewModel : ReactiveObject, IActivatableViewModel
     {
         /// <summary>
         /// Property helper for power.
         /// </summary>
-        private readonly ObservableAsPropertyHelper<bool> poweredOn;
+        private ObservableAsPropertyHelper<bool> poweredOn;
 
         /// <summary>
         /// Property helper for the title.
         /// </summary>
-        private readonly ObservableAsPropertyHelper<string> title;
+        private ObservableAsPropertyHelper<string> title;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderViewModel"/> class.
@@ -61,30 +62,33 @@ namespace Mac.Digital.ViewModels
                 throw new ArgumentNullException(nameof(navigationManager));
             }
 
-            this.poweredOn = powerService.PoweredOn.ToProperty(this, x => x.PoweredOn);
-            this.title = titleService.Title.ToProperty(this, x => x.Title);
-            var policy = policyProvider.GetPolicy();
-
-            this.TogglePower = ReactiveCommand.CreateFromTask(async (ct) =>
+            this.WhenActivated(disposable =>
             {
-                switch (this.PoweredOn)
+                this.poweredOn = powerService.PoweredOn.ToProperty(this, x => x.PoweredOn).DisposeWith(disposable);
+                this.title = titleService.Title.ToProperty(this, x => x.Title).DisposeWith(disposable);
+                var policy = policyProvider.GetPolicy();
+
+                this.TogglePower = ReactiveCommand.CreateFromTask(async (ct) =>
                 {
-                    case true:
-                        await policy.ExecuteAsync(
-                            async (token) => await powerService.PowerOff(token),
-                            ct);
-                        break;
-                    case false:
-                        await policy.ExecuteAsync(
-                            async (token) => await powerService.PowerOn(token),
-                            ct);
-                        break;
-                }
-            });
+                    switch (this.PoweredOn)
+                    {
+                        case true:
+                            await policy.ExecuteAsync(
+                                async (token) => await powerService.PowerOff(token),
+                                ct);
+                            break;
+                        case false:
+                            await policy.ExecuteAsync(
+                                async (token) => await powerService.PowerOn(token),
+                                ct);
+                            break;
+                    }
+                }).DisposeWith(disposable);
 
-            this.Settings = ReactiveCommand.Create(() =>
-            {
-                navigationManager.NavigateTo("/Settings");
+                this.Settings = ReactiveCommand.Create(() =>
+                {
+                    navigationManager.NavigateTo("/Settings");
+                }).DisposeWith(disposable);
             });
         }
 
@@ -101,12 +105,17 @@ namespace Mac.Digital.ViewModels
         /// <summary>
         /// Gets a command that toggles the power.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> TogglePower { get; }
+        public ReactiveCommand<Unit, Unit> TogglePower { get; private set; }
 
         /// <summary>
         /// Gets a command that toggles the power.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> Settings { get; }
+        public ReactiveCommand<Unit, Unit> Settings { get; private set; }
+
+        /// <summary>
+        /// Gets the ViewModel Activator.
+        /// </summary>
+        public ViewModelActivator Activator { get; } = new ViewModelActivator();
 
         /// <summary>
         /// Cleans up any subscriptions in this viewmodel.
