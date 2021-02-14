@@ -82,7 +82,10 @@ namespace Mac.Digital.ViewModels
                 }
             });
 
-            this.Settings = ReactiveCommand.Create(() => navigationManager.NavigateTo("/Settings"));
+            this.Settings = ReactiveCommand.Create(() =>
+            {
+                navigationManager.NavigateTo("/Settings");
+            });
         }
 
         /// <summary>
