@@ -177,16 +177,16 @@ namespace Mac.Digital.Simulation
         public IObservable<decimal> Pressure => this.pressure.CombineLatest(this.pressureOffset, (p, o) => Math.Round(p + o, 3)).DistinctUntilChanged();
 
         /// <inheritdoc />
-        public IObservable<decimal> PressureOffset => this.pressureOffset;
+        public IObservable<decimal> PressureOffset => this.pressureOffset.AsObservable();
 
         /// <inheritdoc />
-        public IObservable<decimal> TargetPressure => this.targetPressure;
+        public IObservable<decimal> TargetPressure => this.targetPressure.AsObservable();
 
         /// <inheritdoc />
         public IObservable<decimal> Temperature => this.temperature.CombineLatest(this.temperatureOffset, (t, o) => Math.Round(t + o, 2)).DistinctUntilChanged();
 
         /// <inheritdoc />
-        public IObservable<decimal> TemperatureOffset => this.temperatureOffset;
+        public IObservable<decimal> TemperatureOffset => this.temperatureOffset.AsObservable();
 
         /// <inheritdoc />
         public IObservable<bool> Protection => this.protection.DistinctUntilChanged();
