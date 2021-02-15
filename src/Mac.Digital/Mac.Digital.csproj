@@ -26,6 +26,8 @@
     <PackageReference Include="Microsoft.MobileBlazorBindings" Version="0.5.50-preview" />
     <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="ReactiveUI.Blazor" Version="13.1.1" />
+    <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
+    <PackageReference Include="Splat.Microsoft.Extensions.Logging" Version="10.0.1" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />

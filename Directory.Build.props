@@ -3,6 +3,7 @@
     <IsTestProject Condition="$(MSBuildProjectName.ToLower().Contains('.tests'))">true</IsTestProject>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DefineConstants>$(DefineConstants);SIMULATION</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ namespace Mac.Digital.ViewModels
     using System.Reactive;
     using System.Reactive.Disposables;
     using System.Threading;
+    using System.Windows.Input;
     using Mac.Digital.Policies;
     using Mac.Digital.Services;
     using Microsoft.AspNetCore.Components;
@@ -28,6 +29,11 @@ namespace Mac.Digital.ViewModels
         /// Property helper for the title.
         /// </summary>
         private ObservableAsPropertyHelper<string> title;
+
+        /// <summary>
+        /// Property helper for can execute toggle power.
+        /// </summary>
+        private ObservableAsPropertyHelper<bool> canExecuteTogglePower;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HeaderViewModel"/> class.
@@ -89,23 +95,30 @@ namespace Mac.Digital.ViewModels
                 {
                     navigationManager.NavigateTo("/Settings");
                 }).DisposeWith(disposable);
+
+                this.canExecuteTogglePower = this.TogglePower.CanExecute.ToProperty(this, x => x.CanExecuteTogglePower).DisposeWith(disposable);
             });
         }
 
         /// <summary>
         /// Gets a value indicating whether the machine is powered on.
         /// </summary>
-        public bool PoweredOn => this.poweredOn.Value;
+        public bool PoweredOn => this.poweredOn?.Value ?? false;
 
         /// <summary>
         /// Gets the title.
         /// </summary>
-        public string Title => this.title.Value;
+        public string Title => this.title?.Value;
 
         /// <summary>
         /// Gets a command that toggles the power.
         /// </summary>
         public ReactiveCommand<Unit, Unit> TogglePower { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether you can execute TogglePower.
+        /// </summary>
+        public bool CanExecuteTogglePower => this.canExecuteTogglePower.Value;
 
         /// <summary>
         /// Gets a command that toggles the power.
@@ -116,16 +129,5 @@ namespace Mac.Digital.ViewModels
         /// Gets the ViewModel Activator.
         /// </summary>
         public ViewModelActivator Activator { get; } = new ViewModelActivator();
-
-        /// <summary>
-        /// Cleans up any subscriptions in this viewmodel.
-        /// </summary>
-        public void Dispose()
-        {
-            this.poweredOn.Dispose();
-            this.title.Dispose();
-            this.TogglePower.Dispose();
-            this.Settings.Dispose();
-        }
     }
 }

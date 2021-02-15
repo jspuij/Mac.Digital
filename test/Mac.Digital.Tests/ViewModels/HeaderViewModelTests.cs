@@ -44,15 +44,15 @@ namespace Mac.Digital.Tests.ViewModels
 
             var subject = new BehaviorSubject<bool>(false);
             this.powerService.Setup(x => x.PoweredOn).Returns(subject);
-            this.powerService.Setup(x => x.PowerOn(It.IsAny<CancellationToken>())).Returns(() =>
+            this.powerService.Setup(x => x.PowerOn(It.IsAny<CancellationToken>())).Returns(async () =>
             {
+                await Task.Delay(100);
                 subject.OnNext(true);
-                return Task.CompletedTask;
             });
-            this.powerService.Setup(x => x.PowerOff(It.IsAny<CancellationToken>())).Returns(() =>
+            this.powerService.Setup(x => x.PowerOff(It.IsAny<CancellationToken>())).Returns(async () =>
             {
+                await Task.Delay(100);
                 subject.OnNext(false);
-                return Task.CompletedTask;
             });
 
             this.titleService = new Mock<ITitleService>();
@@ -189,6 +189,26 @@ namespace Mac.Digital.Tests.ViewModels
 
             ((ICommand)instance.TogglePower).Execute(null);
             instance.PoweredOn.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Toggle power will trigger CanExecute.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
+        [Fact]
+        public async Task TogglePowerWillTriggerCanExecute()
+        {
+            var instance = new HeaderViewModel(
+              this.powerService.Object,
+              this.titleService.Object,
+              this.policyProvider.Object,
+              this.navigationManager);
+            instance.Activator.Activate();
+
+            ((ICommand)instance.TogglePower).Execute(null);
+            instance.CanExecuteTogglePower.Should().BeFalse();
+            await Task.Delay(200);
+            instance.CanExecuteTogglePower.Should().BeTrue();
         }
 
         /// <summary>

@@ -18,5 +18,11 @@ namespace Mac.Digital.Services
         /// Gets an obserable value indicating the title.
         /// </summary>
         IObservable<string> Title { get; }
+
+        /// <summary>
+        /// Sets the title.
+        /// </summary>
+        /// <param name="title">The title to set.</param>
+        void SetTitle(string title);
     }
 }

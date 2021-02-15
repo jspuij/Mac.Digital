@@ -6,15 +6,23 @@
 namespace Mac.Digital
 {
     using System;
+    using System.Threading;
     using Blazorise;
     using Blazorise.Bootstrap;
     using Blazorise.Icons.FontAwesome;
     using Mac.Digital.Policies;
+    using Mac.Digital.Services;
+    using Mac.Digital.Simulation;
+    using Mac.Digital.ViewModels;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.FileProviders;
     using Microsoft.Extensions.Hosting;
     using Microsoft.MobileBlazorBindings;
     using Polly;
+    using ReactiveUI;
+    using Splat;
+    using Splat.Microsoft.Extensions.DependencyInjection;
+    using Splat.Microsoft.Extensions.Logging;
     using Xamarin.Essentials;
     using Xamarin.Forms;
 
@@ -32,6 +40,11 @@ namespace Mac.Digital
             var hostBuilder = MobileBlazorBindingsHost.CreateDefaultBuilder()
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.UseMicrosoftDependencyResolver();
+                    var resolver = Locator.CurrentMutable;
+                    resolver.InitializeSplat();
+                    resolver.InitializeReactiveUI();
+
                     // Adds web-specific services such as NavigationManager
                     services.AddBlazorHybrid();
 
@@ -46,6 +59,19 @@ namespace Mac.Digital
                     // Default command timeout is 3 seconds.
                     services.AddSingleton<ICommandPolicyProvider>(s
                         => new DelegateCommandPolicyProvider(() => Policy.TimeoutAsync(3)));
+
+#if SIMULATION
+                    services.AddScoped(s => new ServiceSimulation(SynchronizationContext.Current));
+                    services.AddScoped<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
+                    services.AddScoped<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
+#endif
+
+                    services.AddSingleton<ITitleService, TitleService>();
+                    services.AddScoped<HeaderViewModel>();
+                })
+                .ConfigureLogging(loggingBuilder =>
+                {
+                    loggingBuilder.AddSplat();
                 })
                 .UseWebRoot("wwwroot");
 
@@ -59,6 +85,8 @@ namespace Mac.Digital
             }
 
             var host = hostBuilder.Build();
+
+            host.Services.UseMicrosoftDependencyResolver();
 
             host.Services
               .UseBootstrapProviders()
