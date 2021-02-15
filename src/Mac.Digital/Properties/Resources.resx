@@ -120,4 +120,7 @@
   <data name="ProtectionTemperatureExceeded" xml:space="preserve">
     <value>Protection temperature of {0} is still exceeded.</value>
   </data>
+  <data name="WelcomeToMacDigital" xml:space="preserve">
+    <value>Welcome to the Mac Digital Coffee Machine</value>
+  </data>
 </root>

@@ -68,5 +68,14 @@ namespace Mac.Digital.Properties {
                 return ResourceManager.GetString("ProtectionTemperatureExceeded", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Welcome to the Mac Digital Coffee Machine.
+        /// </summary>
+        internal static string WelcomeToMacDigital {
+            get {
+                return ResourceManager.GetString("WelcomeToMacDigital", resourceCulture);
+            }
+        }
     }
 }
