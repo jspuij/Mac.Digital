@@ -174,8 +174,9 @@ namespace Mac.Digital.Tests.ViewModels
         /// <summary>
         /// Can toggle the power.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
-        public void CanTogglePower()
+        public async Task CanTogglePower()
         {
             var instance = new HeaderViewModel(
               this.powerService.Object,
@@ -185,9 +186,11 @@ namespace Mac.Digital.Tests.ViewModels
             instance.Activator.Activate();
 
             ((ICommand)instance.TogglePower).Execute(null);
+            await Task.Delay(200);
             instance.PoweredOn.Should().BeTrue();
 
             ((ICommand)instance.TogglePower).Execute(null);
+            await Task.Delay(200);
             instance.PoweredOn.Should().BeFalse();
         }
 
