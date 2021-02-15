@@ -15,7 +15,7 @@ namespace Mac.Digital.Tests.Services
     /// </summary>
     public class TitleServiceTests
     {
-        private TitleService testClass;
+        private readonly TitleService testClass;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TitleServiceTests"/> class.

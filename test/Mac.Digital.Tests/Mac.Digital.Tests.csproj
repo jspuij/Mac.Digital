@@ -8,12 +8,18 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mac.Digital\Mac.Digital.csproj" />
+    <PackageReference Include="bunit.web" Version="1.0.0-preview-01" />
+    <PackageReference Include="bunit.xunit" Version="1.0.0-preview-01" />
     <PackageReference Include="coverlet.collector" Version="3.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="WebUI\Shared\" />
   </ItemGroup>
 
 
