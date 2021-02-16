@@ -19,7 +19,7 @@ namespace Mac.Digital.Services
         /// <summary>
         /// The title subject.
         /// </summary>
-        private readonly Subject<string> title = new Subject<string>();
+        private readonly BehaviorSubject<string> title = new BehaviorSubject<string>(string.Empty);
 
         /// <summary>
         /// Gets an obserable value indicating the title.

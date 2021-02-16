@@ -1,22 +1,22 @@
 ﻿@inherits ReactiveComponentBase<HeaderViewModel>
 
-    <Bar Class="navbar navbar-expand navbar-light bg-light">
-        <BarBrand>
-            <img id="logo" src="/_content/Mac.Digital/img/logo.png" />
-        </BarBrand>
-        <BarMenu>
-            <BarStart>
-                Mac Digital
-            </BarStart>
-            <BarEnd>
-                <BarItem>
-                    <Blazorise.Button Outline="true" Command="@ViewModel.TogglePower" Disabled="@(!ViewModel.CanExecuteTogglePower)" Color="this.ViewModel.PoweredOn ? Blazorise.Color.Success : Blazorise.Color.Primary">
-                        <Icon Name="@("fa-power-off")" IconStyle="IconStyle.Solid" />
-                    </Blazorise.Button>
-                    <Blazorise.Button Outline="true" Command="@ViewModel.Settings"  Color="Blazorise.Color.Secondary">
-                        <Icon Name="@("fa-cog")" IconStyle="IconStyle.Solid" />
-                    </Blazorise.Button>
-                </BarItem>
-            </BarEnd>
-        </BarMenu>
-    </Bar>
+<Bar Class="navbar navbar-expand navbar-light bg-light">
+    <BarBrand>
+        <img id="logo" src="/_content/Mac.Digital/img/logo.png" />
+    </BarBrand>
+    <BarMenu>
+        <BarStart>
+            <h3 class="text-primary">@ViewModel.Title</h3>
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <Blazorise.Button  Outline="@(!ViewModel.PoweredOn)" Command="@ViewModel.TogglePower" Disabled="@(!ViewModel.CanExecuteTogglePower)" Color="this.ViewModel.PoweredOn ? Blazorise.Color.Success : Blazorise.Color.Primary">
+                    <Icon Name="@("fa-power-off")" IconStyle="IconStyle.Solid" />
+                </Blazorise.Button>
+                <Blazorise.Button Outline="true" Command="@ViewModel.Settings"  Color="Blazorise.Color.Secondary">
+                    <Icon Name="@("fa-cog")" IconStyle="IconStyle.Solid" />
+                </Blazorise.Button>
+            </BarItem>
+        </BarEnd>
+    </BarMenu>
+</Bar>

@@ -18,9 +18,5 @@
 
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="WebUI\Shared\" />
-  </ItemGroup>
-
 
 </Project>
