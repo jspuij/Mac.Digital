@@ -34,28 +34,43 @@ namespace Mac.Digital.Tests.Helpers
 
             this.TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            this.TestContext.Services.AddSingleton<ICommandPolicyProvider>(s
-                => new DelegateCommandPolicyProvider(() => Policy.TimeoutAsync(3)));
-
-            // Register app-specific services
-            this.TestContext.Services.AddBlazorise(options =>
-            {
-                options.ChangeTextOnKeyPress = true;
-            })
-            .AddBootstrapProviders()
-            .AddFontAwesomeIcons();
-
-            this.TestContext.Services.AddSingleton<ITitleService, TitleService>();
-            this.TestContext.Services.AddSingleton<NavigationManager, TestableNavigationManager>();
-            this.TestContext.Services.AddSingleton<HeaderViewModel>();
-            this.TestContext.Services.AddSingleton(s => new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false));
-            this.TestContext.Services.AddSingleton<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
-            this.TestContext.Services.AddSingleton<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
+            SetupDependencyInjection(this.TestContext.Services);
         }
 
         /// <summary>
         /// Gets the bUnit test context.
         /// </summary>
         public TestContext TestContext { get; }
+
+        /// <summary>
+        /// Sets up dependency injection for the bUnit tests.
+        /// </summary>
+        /// <param name="services">The services to set up.</param>
+        public static void SetupDependencyInjection(IServiceCollection services)
+        {
+            if (services is null)
+            {
+                throw new System.ArgumentNullException(nameof(services));
+            }
+
+            services.AddSingleton<ICommandPolicyProvider>(s
+                => new DelegateCommandPolicyProvider(() => Policy.TimeoutAsync(3)));
+
+            // Register app-specific services
+            services.AddBlazorise(options =>
+            {
+                options.ChangeTextOnKeyPress = true;
+            })
+            .AddBootstrapProviders()
+            .AddFontAwesomeIcons();
+
+            services.AddSingleton<ITitleService, TitleService>();
+            services.AddSingleton<NavigationManager, TestableNavigationManager>();
+            services.AddSingleton<HeaderViewModel>();
+            services.AddSingleton<MachineOffCheckViewModel>();
+            services.AddSingleton(s => new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false));
+            services.AddSingleton<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
+            services.AddSingleton<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
+        }
     }
 }

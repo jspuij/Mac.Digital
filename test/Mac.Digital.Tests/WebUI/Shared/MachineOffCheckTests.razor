@@ -1,0 +1,17 @@
+﻿@inherits TestComponentBase
+
+<Fixture Setup="SetupRendersCardToTurnMachineOnWhenOff" Test="RendersCardToTurnMachineOnWhenOff">
+    <ComponentUnderTest>
+        <MachineOffCheck>
+            <p>This is a test.</p>
+        </MachineOffCheck>
+    </ComponentUnderTest>
+</Fixture>
+
+<Fixture Setup="SetupRendersChildContentWhenMachineOn" Test="RendersChildContentWhenMachineOn">
+    <ComponentUnderTest>
+        <MachineOffCheck>
+            <p>This is a test.</p>
+        </MachineOffCheck>
+    </ComponentUnderTest>
+</Fixture>
