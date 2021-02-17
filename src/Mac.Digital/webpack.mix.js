@@ -12,6 +12,8 @@
  */
 
 mix
+    .setPublicPath('wwwroot')
+    .setResourceRoot('/_content/Mac.Digital')
     .ts("ts/index.ts", "wwwroot/js")
     .sass('scss/main.scss', 'wwwroot/css')
     .webpackConfig({

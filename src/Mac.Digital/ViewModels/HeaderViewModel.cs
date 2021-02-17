@@ -108,7 +108,7 @@ namespace Mac.Digital.ViewModels
         /// <summary>
         /// Gets the title.
         /// </summary>
-        public string Title => this.title?.Value;
+        public string Title => this.title?.Value ?? string.Empty;
 
         /// <summary>
         /// Gets a command that toggles the power.
@@ -118,7 +118,7 @@ namespace Mac.Digital.ViewModels
         /// <summary>
         /// Gets a value indicating whether you can execute TogglePower.
         /// </summary>
-        public bool CanExecuteTogglePower => this.canExecuteTogglePower.Value;
+        public bool CanExecuteTogglePower => this.canExecuteTogglePower?.Value ?? false;
 
         /// <summary>
         /// Gets a command that toggles the power.

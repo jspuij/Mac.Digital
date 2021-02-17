@@ -34,6 +34,16 @@ namespace Mac.Digital.Tests.WebUI.Shared
         }
 
         /// <summary>
+        /// Checks that the View receives a viewmodel after activation.
+        /// </summary>
+        [Fact]
+        public void HasViewModel()
+        {
+            var cut = this.testContext.RenderComponent<Header>();
+            cut.Instance.ViewModel.Should().NotBeNull();
+        }
+
+        /// <summary>
         /// Tests that the component renders correctly.
         /// </summary>
         [Fact]

@@ -266,5 +266,23 @@ namespace Mac.Digital.Tests.ViewModels
             this.navigationManager.LastUri.Should().Be("/Settings");
             this.navigationManager.LastForceLoad.Should().BeFalse();
         }
+
+        /// <summary>
+        /// Has default values when not activated yet.
+        /// </summary>
+        [Fact]
+        public void HasDefaultValues()
+        {
+            var instance = new HeaderViewModel(
+            this.powerService.Object,
+            this.titleService.Object,
+            this.policyProvider.Object,
+            this.navigationManager);
+
+            instance.Title.Should().BeEmpty();
+            instance.PoweredOn.Should().BeFalse();
+            instance.CanExecuteTogglePower.Should().BeFalse();
+            instance.Settings.Should().BeNull();
+        }
     }
 }

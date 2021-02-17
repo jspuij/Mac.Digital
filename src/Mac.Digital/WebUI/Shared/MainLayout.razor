@@ -1,12 +1,12 @@
 ﻿@inherits LayoutComponentBase
-<div id="background">
-</div>
 <Blazorise.Layout >
     <LayoutHeader Fixed="true">
         <Header />
     </LayoutHeader>
     <LayoutContent>
-        @Body
+        <div class="container p-5">
+            @Body
+        </div>
     </LayoutContent>
     <LayoutFooter class="b-layout-footer-fixed bg-light">
         <Footer />

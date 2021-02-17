@@ -1,7 +1,10 @@
 ﻿$theme-colors: ( "primary": #6f4e37, );
 
 @import "node_modules/bootstrap/scss/bootstrap";
-
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/brands';
 
 #blazor-error-ui {
     background: lightyellow;

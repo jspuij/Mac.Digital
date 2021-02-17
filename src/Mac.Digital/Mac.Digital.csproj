@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.2.5" />
-    <PackageReference Include="Microsoft.MobileBlazorBindings" Version="0.5.50-preview" />
+    <PackageReference Include="Microsoft.MobileBlazorBindings" Version="0.6.67-preview" />
     <PackageReference Include="Polly" Version="7.2.1" />
     <PackageReference Include="ReactiveUI.Blazor" Version="13.1.1" />
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection" Version="10.0.1" />

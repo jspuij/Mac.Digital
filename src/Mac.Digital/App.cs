@@ -67,6 +67,7 @@ namespace Mac.Digital
 #endif
 
                     services.AddSingleton<ITitleService, TitleService>();
+                    services.AddScoped<MachineOffCheckViewModel>();
                     services.AddScoped<HeaderViewModel>();
                 })
                 .ConfigureLogging(loggingBuilder =>
