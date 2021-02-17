@@ -59,7 +59,11 @@ namespace Mac.Digital.Tests.WebUI.Shared
             var powerButton = cut.FindAll("button").First();
 
             powerButton.Click();
-            cut.WaitForAssertion(() => cut.Markup.Should().Contain("btn-success"));
+            cut.WaitForAssertion(() =>
+            {
+                powerButton = cut.FindAll("button").First();
+                powerButton.ClassList.Should().Contain("btn-success");
+            });
         }
 
         /// <summary>
@@ -69,10 +73,14 @@ namespace Mac.Digital.Tests.WebUI.Shared
         public void PowerOnDisablesDuringExecution()
         {
             var cut = this.testContext.RenderComponent<Header>();
-            cut.Markup.Should().NotContain("disabled");
             var powerButton = cut.FindAll("button").First();
+
             powerButton.Click();
-            cut.WaitForAssertion(() => cut.Markup.Should().Contain("disabled"));
+            cut.WaitForAssertion(() =>
+            {
+                powerButton = cut.FindAll("button").First();
+                powerButton.Attributes.Should().Contain(a => a.Name == "disabled");
+            });
         }
 
         /// <summary>
@@ -88,7 +96,11 @@ namespace Mac.Digital.Tests.WebUI.Shared
             await Task.Delay(20);
 
             powerButton.Click();
-            cut.WaitForAssertion(() => cut.Markup.Should().Contain("btn-outline-primary"));
+            cut.WaitForAssertion(() =>
+            {
+                powerButton = cut.FindAll("button").First();
+                powerButton.ClassList.Should().Contain("btn-outline-primary");
+            });
         }
 
         /// <summary>
