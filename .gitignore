@@ -338,3 +338,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/src/Mac.Digital.Android/Assets/wwwroot.zip

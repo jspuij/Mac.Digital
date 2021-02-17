@@ -5,19 +5,12 @@
 
 namespace Mac.Digital.Tests.WebUI.Shared
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Blazorise;
     using Bunit;
     using FluentAssertions;
-    using Mac.Digital.Policies;
-    using Mac.Digital.Services;
     using Mac.Digital.Tests.Helpers;
-    using Mac.Digital.ViewModels;
     using Mac.Digital.WebUI.Shared;
-    using Microsoft.AspNetCore.Components;
-    using Moq;
-    using Xunit;
 
     /// <summary>
     /// Unit tests for the <see cref="MachineOffCheck"/> component.
