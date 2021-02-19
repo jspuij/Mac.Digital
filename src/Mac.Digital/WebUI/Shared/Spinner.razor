@@ -109,5 +109,11 @@
                 }
                 break;
         }
+        ValueChanged.InvokeAsync(this.Value);
     }
+
+    /// <summary>
+    /// Gets or sets a callback that updates the bound value.
+    /// </summary>
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
 }

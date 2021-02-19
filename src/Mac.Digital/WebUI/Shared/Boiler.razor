@@ -30,7 +30,7 @@
         <CardTitle Size="5">Boiler</CardTitle>
         <Field>
             <FieldLabel>Target Pressure</FieldLabel>
-            <Spinner TValue="decimal" @bind-Value="" Min="0.01m" Max="1.99m" Step="0.01m" Decimals="2" Suffix="bar"></Spinner>
+            <Spinner TValue="decimal" @bind-Value="ViewModel.TargetPressure" Min="0.01m" Max="1.99m" Step="0.01m" Decimals="2" Suffix="bar"></Spinner>
         </Field>
 
     </CardBody>
