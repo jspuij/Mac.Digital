@@ -1,0 +1,37 @@
+﻿@inherits ReactiveComponentBase<BoilerViewModel>
+
+<Card>
+    <CardHeader>
+        <div class="float-left">
+            <h1 class="text-primary">
+                <span style="white-space:nowrap"><Icon Name="@("fab fa-cloudscale")" /> @($"{this.ViewModel.Pressure:F2} bar")</span>
+                <span style="white-space:nowrap"><Icon Name="@("fa-thermometer-half")" IconStyle="IconStyle.Solid" /> @($"{this.ViewModel.Temperature:F1} °C")</span>
+            </h1>
+        </div>
+        <div class="float-right">
+            <h3 class="text-right">
+                <span>
+                    @if (this.ViewModel.TemperatureTrend == Trend.Rising)
+                    {
+                        <Icon Name="@("fa-long-arrow-alt-up")" IconStyle="IconStyle.Solid" Class="text-secondary" />
+                    }
+                    else if(this.ViewModel.TemperatureTrend == Trend.Falling)
+                    {
+                        <Icon Name="@("fa-long-arrow-alt-down")" IconStyle="IconStyle.Solid" Class="text-secondary" />
+                    }
+                    <Icon Name="@("fa-burn")" IconStyle="IconStyle.Solid" Class="@(this.ViewModel.Heating ? "text-danger" : "text-secondary")" />
+                </span>
+            </h3>
+        </div>
+        <div class="clearfix"></div>
+    </CardHeader>
+    <CardImage Source="/_content/Mac.Digital/img/boiler.webp" Alt="Bioler"></CardImage>
+    <CardBody>
+        <CardTitle Size="5">Boiler</CardTitle>
+        <Field>
+            <FieldLabel>Target Pressure</FieldLabel>
+            <Spinner TValue="decimal" @bind-Value="" Min="0.01m" Max="1.99m" Step="0.01m" Decimals="2" Suffix="bar"></Spinner>
+        </Field>
+
+    </CardBody>
+</Card>

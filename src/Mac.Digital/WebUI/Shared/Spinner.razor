@@ -1,0 +1,113 @@
+﻿@typeparam TValue
+
+@using System.Globalization;
+
+@inject IJSRuntime JS;
+
+@{
+    var inv = CultureInfo.InvariantCulture;
+}
+
+<input @ref="input" type="number" value="@string.Format(inv, "{0}", Value)" min="@string.Format(inv, "{0}", Min)" max="@string.Format(inv, "{0}", Max)" step="@string.Format(inv, "{0}", Step)" data-decimals="@Decimals" data-suffix="@Suffix" @onchange="OnChange" />
+
+@code
+{
+    private ElementReference input;
+
+    /// <summary>
+    /// Gets or sets the Value.
+    /// </summary>
+    [Parameter]
+    public TValue Value { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Min.
+    /// </summary>
+    [Parameter]
+    public TValue Min { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Max.
+    /// </summary>
+    [Parameter]
+    public TValue Max { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Step.
+    /// </summary>
+    [Parameter]
+    public TValue Step { get; set; }
+
+    /// <summary>
+    /// Gets or sets the decimals.
+    /// </summary>
+    [Parameter]
+    public int Decimals { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Step.
+    /// </summary>
+    [Parameter]
+    public string Suffix { get; set; }
+
+    /// <inheritdoc />
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("MacDigital.createSpinner", this.input);
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Spinner{TValue}"/> class.
+    /// </summary>
+    public Spinner()
+    {
+        var supportedTypes = new Type[] { typeof(decimal), typeof(float), typeof(double), typeof(long), typeof(int) };
+
+        if (!supportedTypes.Contains(typeof(TValue)))
+        {
+            throw new InvalidCastException(Properties.Resources.DataTypeIncorrectForSpinner);
+        }
+    }
+
+    private void OnChange(ChangeEventArgs args)
+    {
+        string stringValue = args.Value as string;
+
+        switch (typeof(TValue).Name)
+        {
+            case nameof(System.Decimal):
+                if (decimal.TryParse(stringValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out decimal decimalValue))
+                {
+                    this.Value = (TValue)Convert.ChangeType(decimalValue, typeof(TValue));
+                }
+                break;
+            case nameof(System.Double):
+                if (double.TryParse(stringValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out double doubleValue))
+                {
+                    this.Value = (TValue)Convert.ChangeType(doubleValue, typeof(TValue));
+                }
+                break;
+            case nameof(System.Single):
+                if (float.TryParse(stringValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out float floatValue))
+                {
+                    this.Value = (TValue)Convert.ChangeType(floatValue, typeof(TValue));
+                }
+                break;
+            case nameof(System.Int64):
+                if (long.TryParse(stringValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out long longValue))
+                {
+                    this.Value = (TValue)Convert.ChangeType(longValue, typeof(TValue));
+                }
+                break;
+            case nameof(System.Int32):
+                if (int.TryParse(stringValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out int intValue))
+                {
+                    this.Value = (TValue)Convert.ChangeType(intValue, typeof(TValue));
+                }
+                break;
+        }
+    }
+}

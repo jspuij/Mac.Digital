@@ -61,6 +61,15 @@ namespace Mac.Digital.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The datatype is incorrect for the spinner.
+        /// </summary>
+        internal static string DataTypeIncorrectForSpinner {
+            get {
+                return ResourceManager.GetString("DataTypeIncorrectForSpinner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Protection temperature of {0} is still exceeded..
         /// </summary>
         internal static string ProtectionTemperatureExceeded {

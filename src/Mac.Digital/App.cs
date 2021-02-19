@@ -69,6 +69,7 @@ namespace Mac.Digital
                     services.AddSingleton<ITitleService, TitleService>();
                     services.AddScoped<MachineOffCheckViewModel>();
                     services.AddScoped<HeaderViewModel>();
+                    services.AddScoped<BoilerViewModel>();
                 })
                 .ConfigureLogging(loggingBuilder =>
                 {
