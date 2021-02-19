@@ -61,7 +61,7 @@ namespace Mac.Digital
                         => new DelegateCommandPolicyProvider(() => Policy.TimeoutAsync(3)));
 
 #if SIMULATION
-                    services.AddScoped(s => new ServiceSimulation(SynchronizationContext.Current));
+                    services.AddScoped(s => new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false));
                     services.AddScoped<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
                     services.AddScoped<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
 #endif
