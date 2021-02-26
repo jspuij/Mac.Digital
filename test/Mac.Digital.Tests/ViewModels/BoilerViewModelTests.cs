@@ -195,6 +195,32 @@ namespace Mac.Digital.Tests.ViewModels
         }
 
         /// <summary>
+        /// Tests that the protection can be reset.
+        /// </summary>
+        [Fact]
+        public void CanResetProtection()
+        {
+            bool canExecute = false;
+
+            this.boilerService.Setup(x => x.ResetProtection(It.IsAny<CancellationToken>())).Returns(() =>
+            {
+                this.protection.OnNext(false);
+                return Task.CompletedTask;
+            });
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+            instance.ResetProtection.CanExecute.Subscribe(c => canExecute = c);
+
+            this.protection.OnNext(true);
+            instance.Protection.Should().BeTrue("Protection should be true initially.");
+            canExecute.Should().BeTrue("Should be allowed to execute resetProtection.");
+            instance.ResetProtection.Execute().Subscribe();
+
+            instance.Protection.Should().BeFalse("Protection should be reset now.");
+        }
+
+        /// <summary>
         /// Has default values when not activated yet.
         /// </summary>
         [Fact]
