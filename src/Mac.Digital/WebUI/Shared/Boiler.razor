@@ -15,15 +15,21 @@
                     {
                         <Icon Name="@("fa-long-arrow-alt-up")" IconStyle="IconStyle.Solid" Class="text-secondary" />
                     }
-                    else if(this.ViewModel.TemperatureTrend == Trend.Falling)
+                    else if (this.ViewModel.TemperatureTrend == Trend.Falling)
                     {
                         <Icon Name="@("fa-long-arrow-alt-down")" IconStyle="IconStyle.Solid" Class="text-secondary" />
                     }
                     <Icon Name="@("fa-burn")" IconStyle="IconStyle.Solid" Class="@(this.ViewModel.Heating ? "text-danger" : "text-secondary")" />
+                    @if (this.ViewModel.Protection)
+                    {
+                        <Blazorise.Link @onclick="Reset" To="#">
+                            <Icon Name="@("fa-exclamation-triangle")" IconStyle="IconStyle.Solid" Class="text-warning"  />
+                        </Blazorise.Link>
+                    }
                 </span>
             </h3>
         </div>
-        <div class="clearfix"></div>
+        <div class=" clearfix"></div>
     </CardHeader>
     <CardImage Source="/_content/Mac.Digital/img/boiler.webp" Alt="Bioler"></CardImage>
     <CardBody>

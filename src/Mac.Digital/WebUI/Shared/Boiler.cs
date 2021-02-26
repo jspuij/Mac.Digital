@@ -8,6 +8,7 @@ namespace Mac.Digital.WebUI.Shared
     using System;
     using System.Collections.Generic;
     using System.Text;
+    using System.Windows.Input;
     using Mac.Digital.ViewModels;
     using Microsoft.AspNetCore.Components;
     using ReactiveUI;
@@ -36,6 +37,14 @@ namespace Mac.Digital.WebUI.Shared
         {
             get => this.ViewModel;
             set => this.ViewModel = value;
+        }
+
+        /// <summary>
+        /// Resets the protection.
+        /// </summary>
+        private void Reset()
+        {
+            ((ICommand)this.ViewModel.ResetProtection).Execute(null);
         }
     }
 }
