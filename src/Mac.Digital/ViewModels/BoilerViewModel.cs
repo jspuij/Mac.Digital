@@ -36,6 +36,16 @@ namespace Mac.Digital.ViewModels
         /// <param name="policyProvider">The policy provider.</param>
         public BoilerViewModel(IBoilerService boilerService, ICommandPolicyProvider policyProvider)
         {
+            if (boilerService is null)
+            {
+                throw new ArgumentNullException(nameof(boilerService));
+            }
+
+            if (policyProvider is null)
+            {
+                throw new ArgumentNullException(nameof(policyProvider));
+            }
+
             this.WhenActivated(disposable =>
             {
                 var policy = policyProvider.GetPolicy();
@@ -58,7 +68,7 @@ namespace Mac.Digital.ViewModels
                     async (value, ct) =>
                     {
                         await policy.ExecuteAsync(
-                            async (token) => await boilerService.SetTargetPressure(value, token), ct);
+                            async token => await boilerService.SetTargetPressure(value, token), ct);
                         return Unit.Default;
                     }).DisposeWith(disposable);
 
@@ -66,6 +76,13 @@ namespace Mac.Digital.ViewModels
                 .Throttle(TimeSpan.FromMilliseconds(1000))
                 .InvokeCommand(setTargetPressureCommand)
                 .DisposeWith(disposable);
+
+                this.ResetProtection = ReactiveCommand.CreateFromTask(
+                    async ct =>
+                    {
+                        await policy.ExecuteAsync(async token => await boilerService.ResetProtection(token), ct);
+                    },
+                    boilerService.Protection).DisposeWith(disposable);
             });
         }
 
@@ -102,6 +119,11 @@ namespace Mac.Digital.ViewModels
         /// Gets a value indicating whether the heating was activated.
         /// </summary>
         public bool Heating => this.heating?.Value ?? false;
+
+        /// <summary>
+        /// Gets a command to reset the protection.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ResetProtection { get; private set; }
 
         /// <summary>
         /// Gets the ViewModel Activator.

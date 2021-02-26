@@ -6,11 +6,16 @@
 namespace Mac.Digital.Tests.ViewModels
 {
     using System;
+    using System.Reactive.Subjects;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using FluentAssertions;
     using Mac.Digital;
     using Mac.Digital.Policies;
     using Mac.Digital.Services;
     using Mac.Digital.ViewModels;
     using Moq;
+    using Polly;
     using ReactiveUI;
     using Xunit;
 
@@ -21,6 +26,11 @@ namespace Mac.Digital.Tests.ViewModels
     {
         private Mock<IBoilerService> boilerService;
         private Mock<ICommandPolicyProvider> policyProvider;
+        private BehaviorSubject<decimal> pressure;
+        private BehaviorSubject<decimal> targetPressure;
+        private BehaviorSubject<decimal> temperature;
+        private BehaviorSubject<bool> heating;
+        private BehaviorSubject<bool> protection;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BoilerViewModelTests"/> class.
@@ -29,6 +39,25 @@ namespace Mac.Digital.Tests.ViewModels
         {
             this.boilerService = new Mock<IBoilerService>();
             this.policyProvider = new Mock<ICommandPolicyProvider>();
+            this.policyProvider.Setup(x => x.GetPolicy()).Returns(Policy.TimeoutAsync(1));
+            this.pressure = new BehaviorSubject<decimal>(0m);
+            this.targetPressure = new BehaviorSubject<decimal>(0m);
+            this.temperature = new BehaviorSubject<decimal>(0m);
+            this.heating = new BehaviorSubject<bool>(false);
+            this.protection = new BehaviorSubject<bool>(false);
+
+            this.boilerService.Setup(x => x.Pressure).Returns(this.pressure);
+            this.boilerService.Setup(x => x.TargetPressure).Returns(this.targetPressure);
+            this.boilerService.Setup(x => x.Temperature).Returns(this.temperature);
+            this.boilerService.Setup(x => x.Heating).Returns(this.heating);
+            this.boilerService.Setup(x => x.Protection).Returns(this.protection);
+            this.boilerService
+                .Setup(x => x.SetTargetPressure(It.IsAny<decimal>(), It.IsAny<CancellationToken>()))
+                .Returns<decimal, CancellationToken>((d, c) =>
+                {
+                    this.targetPressure.OnNext(d);
+                    return Task.CompletedTask;
+                });
         }
 
         /// <summary>
@@ -65,49 +94,120 @@ namespace Mac.Digital.Tests.ViewModels
         [Fact]
         public void CanGetPressure()
         {
-            Assert.IsType<decimal>(_testClass.Pressure);
-            Assert.True(false, "Create or modify test");
+            var expected = 1.5m;
+            this.pressure.OnNext(expected);
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            instance.Pressure.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Can get and set the target pressure.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous unit test.</returns>
         [Fact]
-        public void CanSetAndGetTargetPressure()
+        public async Task CanSetAndGetTargetPressure()
         {
-            _testClass.CheckProperty(x => x.TargetPressure);
+            var expected = 1.2m;
+            var set = 0m;
+
+            this.targetPressure.Subscribe(x => set = x);
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            instance.TargetPressure = expected;
+
+            instance.TargetPressure.Should().Be(expected, "TargetPressure should immediately reflect set value.");
+            set.Should().Be(0, "TargetPressure did not debounce.");
+
+            await Task.Delay(2000);
+            set.Should().Be(expected, "TargetPressure did not propagate.");
         }
 
+        /// <summary>
+        /// Can get the temperature.
+        /// </summary>
         [Fact]
         public void CanGetTemperature()
         {
-            Assert.IsType<decimal>(_testClass.Temperature);
-            Assert.True(false, "Create or modify test");
+            var expected = 123m;
+            this.temperature.OnNext(expected);
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            instance.Temperature.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Can get the temperature trend.
+        /// </summary>
         [Fact]
         public void CanGetTemperatureTrend()
         {
-            Assert.IsType<Trend>(_testClass.TemperatureTrend);
-            Assert.True(false, "Create or modify test");
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            // set twice
+            this.temperature.OnNext(25m);
+            this.temperature.OnNext(25m);
+
+            instance.TemperatureTrend.Should().Be(Trend.Stable, "2 consecutive values, trend should be stable.");
+
+            this.temperature.OnNext(26m);
+            instance.TemperatureTrend.Should().Be(Trend.Rising, "Trend should be rising.");
+
+            this.temperature.OnNext(24m);
+            instance.TemperatureTrend.Should().Be(Trend.Falling, "Trend should be falling.");
         }
 
+        /// <summary>
+        /// Can Get protection.
+        /// </summary>
         [Fact]
         public void CanGetProtection()
         {
-            Assert.IsType<bool>(_testClass.Protection);
-            Assert.True(false, "Create or modify test");
+            var expected = true;
+            this.protection.OnNext(expected);
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            instance.Protection.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Can get the heating value.
+        /// </summary>
         [Fact]
         public void CanGetHeating()
         {
-            Assert.IsType<bool>(_testClass.Heating);
-            Assert.True(false, "Create or modify test");
+            var expected = true;
+            this.heating.OnNext(expected);
+
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+            instance.Activator.Activate();
+
+            instance.Heating.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Has default values when not activated yet.
+        /// </summary>
         [Fact]
-        public void CanGetActivator()
+        public void HasDefaultValues()
         {
-            Assert.IsType<ViewModelActivator>(_testClass.Activator);
-            Assert.True(false, "Create or modify test");
+            var instance = new BoilerViewModel(this.boilerService.Object, this.policyProvider.Object);
+
+            instance.Heating.Should().BeFalse();
+            instance.Protection.Should().BeFalse();
+            instance.Temperature.Should().Be(0m);
+            instance.Pressure.Should().Be(0m);
+            instance.TargetPressure.Should().Be(0m);
+            instance.TemperatureTrend.Should().Be(Trend.Stable);
         }
     }
 }
