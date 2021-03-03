@@ -68,6 +68,7 @@ namespace Mac.Digital.Tests.Helpers
             services.AddSingleton<NavigationManager, TestableNavigationManager>();
             services.AddSingleton<HeaderViewModel>();
             services.AddSingleton<MachineOffCheckViewModel>();
+            services.AddSingleton<BoilerViewModel>();
             services.AddSingleton(s => new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false));
             services.AddSingleton<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
             services.AddSingleton<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
