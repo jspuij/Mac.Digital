@@ -11,6 +11,7 @@ namespace Mac.Digital.WebUI.Shared
     using System.Windows.Input;
     using Mac.Digital.ViewModels;
     using Microsoft.AspNetCore.Components;
+    using Microsoft.AspNetCore.Components.Web;
     using ReactiveUI;
     using ReactiveUI.Blazor;
 

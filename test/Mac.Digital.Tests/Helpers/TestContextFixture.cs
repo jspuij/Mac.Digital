@@ -28,13 +28,14 @@ namespace Mac.Digital.Tests.Helpers
         /// <summary>
         /// Initializes a new instance of the <see cref="TestContextFixture"/> class.
         /// </summary>
-        public TestContextFixture()
+        /// <param name="serviceSimulation">The service simulation to use.</param>
+        public TestContextFixture(ServiceSimulation serviceSimulation = null)
         {
             this.TestContext = new TestContext();
 
             this.TestContext.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            SetupDependencyInjection(this.TestContext.Services);
+            SetupDependencyInjection(this.TestContext.Services, serviceSimulation);
         }
 
         /// <summary>
@@ -46,11 +47,17 @@ namespace Mac.Digital.Tests.Helpers
         /// Sets up dependency injection for the bUnit tests.
         /// </summary>
         /// <param name="services">The services to set up.</param>
-        public static void SetupDependencyInjection(IServiceCollection services)
+        /// <param name="serviceSimulation">The service simulation to use.</param>
+        public static void SetupDependencyInjection(IServiceCollection services, ServiceSimulation serviceSimulation = null)
         {
             if (services is null)
             {
                 throw new System.ArgumentNullException(nameof(services));
+            }
+
+            if (serviceSimulation == null)
+            {
+                serviceSimulation = new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false);
             }
 
             services.AddSingleton<ICommandPolicyProvider>(s
@@ -69,7 +76,7 @@ namespace Mac.Digital.Tests.Helpers
             services.AddSingleton<HeaderViewModel>();
             services.AddSingleton<MachineOffCheckViewModel>();
             services.AddSingleton<BoilerViewModel>();
-            services.AddSingleton(s => new ServiceSimulation(SynchronizationContext.Current, 10, false, 0m, 1.2m, 0m, 0m, false));
+            services.AddSingleton(serviceSimulation);
             services.AddSingleton<IPowerService>(s => s.GetRequiredService<ServiceSimulation>());
             services.AddSingleton<IBoilerService>(s => s.GetRequiredService<ServiceSimulation>());
         }

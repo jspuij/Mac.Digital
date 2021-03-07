@@ -22,7 +22,7 @@
                     <Icon Name="@("fa-burn")" IconStyle="IconStyle.Solid" Class="@(this.ViewModel.Heating ? "text-danger" : "text-secondary")" />
                     @if (this.ViewModel.Protection)
                     {
-                        <Blazorise.Link @onclick="Reset" To="#">
+                        <Blazorise.Link Clicked="Reset" To="#">
                             <Icon Name="@("fa-exclamation-triangle")" IconStyle="IconStyle.Solid" Class="text-warning"  />
                         </Blazorise.Link>
                     }
@@ -31,7 +31,7 @@
         </div>
         <div class=" clearfix"></div>
     </CardHeader>
-    <CardImage Source="/_content/Mac.Digital/img/boiler.webp" Alt="Bioler"></CardImage>
+    <CardImage Source="/_content/Mac.Digital/img/boiler.webp" Alt="Boiler"></CardImage>
     <CardBody>
         <CardTitle Size="5">Boiler</CardTitle>
         <Field>
